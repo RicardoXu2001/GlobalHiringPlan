@@ -1,0 +1,255 @@
+{
+  "sourceHash": "C4F4A6D71AD1C88A1A176D67160DF08642DEA6F541507C6A99374AD85E504EEF|B691A4B07C270BAF4FBACCFF760CCE71EA859560E21BB76451A06775718105EC|1A7AC802B80DB3132C077960251A78F789ECA08EDEC01B0E1DA586CCF6D2CC12|7A5CB29ADA17535103EA9F7B6CBCEC35D5BFE339CDAB8361E68E84732E9D2FB0|DED6BA7807533AE9A6937B8E4786354780D555C6B255748C62F00F238A4DC79B",
+  "runtime": "Godot 4.5.1 Windows 原生窗口",
+  "input": "@oai/sky Windows 鼠标与键盘",
+  "checks": {
+    "launch": "PASS",
+    "render": "PASS",
+    "input": "PASS",
+    "coreLoop": "PASS",
+    "outcome": "PASS",
+    "restart": "PASS"
+  },
+  "steps": [
+    "干净第0日→东亚第一位员工",
+    "鼠标切至4×，空格暂停并收集两次简历",
+    "免费咖啡→第430日热搜选择高曝光→狼性口号",
+    "第680日选择统一工牌；第940日以团队合照回应监管",
+    "招聘自然传播至12地区；第1139日反制100%，718/1210入职，失败结算",
+    "点击结算中的重新创业：第0日、未开局、6点、无升级"
+  ],
+  "pausedSnapshot": {
+    "area": {
+      "africa": {
+        "contact": 0,
+        "count": 0
+      },
+      "eastAsia": {
+        "contact": 0,
+        "count": 2.942048590812
+      },
+      "eastEU": {
+        "contact": 0,
+        "count": 0
+      },
+      "eastNA": {
+        "contact": 0,
+        "count": 0
+      },
+      "latam": {
+        "contact": 0,
+        "count": 0
+      },
+      "northAF": {
+        "contact": 0,
+        "count": 0
+      },
+      "northAsia": {
+        "contact": 0.0125424834168262,
+        "count": 0
+      },
+      "oceania": {
+        "contact": 0,
+        "count": 0
+      },
+      "southAsia": {
+        "contact": 0.0192961283335788,
+        "count": 0
+      },
+      "southeastAsia": {
+        "contact": 0.0192961283335788,
+        "count": 0
+      },
+      "westEU": {
+        "contact": 0,
+        "count": 0
+      },
+      "westNA": {
+        "contact": 0.0192961283335788,
+        "count": 0
+      }
+    },
+    "awareness": 0.395527920645601,
+    "bubble": "eastAsia",
+    "bubbleAt": 46,
+    "day": 65,
+    "eventIndex": 0,
+    "eventOpen": false,
+    "lastMilestone": 0,
+    "log": "总部启用「内推海报」。",
+    "outcome": {},
+    "paused": true,
+    "points": 0,
+    "resistance": 0,
+    "rngState": "9001414826177423043",
+    "selected": "eastAsia",
+    "speed": 2,
+    "started": true,
+    "upgrades": {
+      "referral": true
+    },
+    "version": 1
+  },
+  "restartSnapshot": {
+    "area": {
+      "africa": {
+        "contact": 0,
+        "count": 0
+      },
+      "eastAsia": {
+        "contact": 0,
+        "count": 0
+      },
+      "eastEU": {
+        "contact": 0,
+        "count": 0
+      },
+      "eastNA": {
+        "contact": 0,
+        "count": 0
+      },
+      "latam": {
+        "contact": 0,
+        "count": 0
+      },
+      "northAF": {
+        "contact": 0,
+        "count": 0
+      },
+      "northAsia": {
+        "contact": 0,
+        "count": 0
+      },
+      "oceania": {
+        "contact": 0,
+        "count": 0
+      },
+      "southAsia": {
+        "contact": 0,
+        "count": 0
+      },
+      "southeastAsia": {
+        "contact": 0,
+        "count": 0
+      },
+      "westEU": {
+        "contact": 0,
+        "count": 0
+      },
+      "westNA": {
+        "contact": 0,
+        "count": 0
+      }
+    },
+    "awareness": 0,
+    "bubble": "",
+    "bubbleAt": 18,
+    "day": 0,
+    "eventIndex": 0,
+    "eventOpen": false,
+    "lastMilestone": 0,
+    "log": "选择起点，给地球发出第一张工牌。",
+    "outcome": {},
+    "paused": false,
+    "points": 6,
+    "resistance": 0,
+    "rngState": "9001414826177423043",
+    "selected": "eastAsia",
+    "speed": 1,
+    "started": false,
+    "upgrades": {},
+    "version": 1
+  },
+  "screenshots": [
+    "qa/evidence/start.jpg",
+    "qa/evidence/playing.jpg",
+    "qa/evidence/outcome.jpg",
+    "qa/evidence/restart.jpg"
+  ],
+  "limitation": "实际输入路线验证了失败与重开；完整获胜只在模拟回归验证，真人平衡与时长未验证",
+  "completeRun": {
+    "id": "native-high-pressure",
+    "cleanContext": true,
+    "terminal": "designed-outcome",
+    "restart": "initial-state",
+    "evidence": "qa/evidence/run.json"
+  },
+  "outcomeSnapshot": {
+    "area": {
+      "africa": {
+        "contact": 0,
+        "count": 28.0888095117792
+      },
+      "eastAsia": {
+        "contact": 0,
+        "count": 150
+      },
+      "eastEU": {
+        "contact": 0,
+        "count": 46.6398683432155
+      },
+      "eastNA": {
+        "contact": 0,
+        "count": 57.1284892998378
+      },
+      "latam": {
+        "contact": 0,
+        "count": 41.4055660185178
+      },
+      "northAF": {
+        "contact": 0,
+        "count": 8.33717873039075
+      },
+      "northAsia": {
+        "contact": 0,
+        "count": 44.8936106891378
+      },
+      "oceania": {
+        "contact": 0,
+        "count": 11.3226756661269
+      },
+      "southAsia": {
+        "contact": 0,
+        "count": 135.921201439331
+      },
+      "southeastAsia": {
+        "contact": 0,
+        "count": 103.569475501266
+      },
+      "westEU": {
+        "contact": 0,
+        "count": 5.68930621657933
+      },
+      "westNA": {
+        "contact": 0,
+        "count": 85.7757133036696
+      }
+    },
+    "awareness": 100,
+    "bubble": "southAsia",
+    "bubbleAt": 1127,
+    "day": 1139,
+    "eventIndex": 4,
+    "eventOpen": false,
+    "lastMilestone": 35,
+    "log": "公司进入西欧！招聘点 +4。",
+    "outcome": {
+      "body": "世界反制完成，公司被拆分。试试更早改善待遇和合规。",
+      "day": 1139,
+      "hires": 718,
+      "win": false
+    },
+    "paused": true,
+    "points": 95,
+    "resistance": 100,
+    "rngState": "2599635543362143445",
+    "selected": "eastAsia",
+    "speed": 4,
+    "started": true,
+    "upgrades": {
+      "coffee": true,
+      "slogan": true
+    },
+    "version": 1
+  }
+}

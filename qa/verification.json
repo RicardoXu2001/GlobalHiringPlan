@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 2,
+  "status": "PASS",
+  "verify": {
+    "command": "& ./godot/验证.ps1",
+    "exitCode": 0,
+    "suites": [
+      "机制回归：qa/evidence/mechanisms.json"
+    ]
+  },
+  "completeRun": {
+    "id": "native-high-pressure",
+    "cleanContext": true,
+    "terminal": "designed-outcome",
+    "restart": "initial-state",
+    "evidence": "qa/evidence/run.json"
+  },
+  "checks": {
+    "launch": {
+      "status": "PASS",
+      "evidence": [
+        "qa/evidence/run.json"
+      ]
+    },
+    "render": {
+      "status": "PASS",
+      "evidence": [
+        "qa/evidence/run.json"
+      ]
+    },
+    "input": {
+      "status": "PASS",
+      "evidence": [
+        "qa/evidence/run.json"
+      ]
+    },
+    "coreLoop": {
+      "status": "PASS",
+      "evidence": [
+        "qa/evidence/run.json"
+      ]
+    },
+    "outcome": {
+      "status": "PASS",
+      "evidence": [
+        "qa/evidence/run.json"
+      ]
+    },
+    "restart": {
+      "status": "PASS",
+      "evidence": [
+        "qa/evidence/run.json"
+      ]
+    }
+  },
+  "limitations": [
+    {
+      "reason": "覆盖范围见当前窗口证据；自动获胜路线不证明真人胜利、平衡或趣味。",
+      "scope": "实机路径与玩法品质"
+    },
+    {
+      "reason": "对应导出模板及干净机器验收待开展。",
+      "scope": "独立Windows包"
+    },
+    {
+      "reason": "经营、贷款、方针尚未实现；真人完整对局与20–25分钟节奏未验证。",
+      "scope": "新Demo与真人节奏"
+    }
+  ]
+}

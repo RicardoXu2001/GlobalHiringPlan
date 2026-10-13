@@ -1,0 +1,369 @@
+{
+  "regions": [
+    {
+      "id": "westNA",
+      "name": "北美西岸",
+      "x": 148,
+      "y": 194,
+      "pop": 90,
+      "fit": 1,
+      "icon": "📣",
+      "trait": "跨洋门户",
+      "links": [
+        "eastNA",
+        "latam",
+        "eastAsia"
+      ]
+    },
+    {
+      "id": "eastNA",
+      "name": "北美东岸",
+      "x": 220,
+      "y": 182,
+      "pop": 105,
+      "fit": 1.05,
+      "icon": "💼",
+      "trait": "商业中心",
+      "links": [
+        "westNA",
+        "latam",
+        "westEU"
+      ]
+    },
+    {
+      "id": "latam",
+      "name": "拉丁美洲",
+      "x": 261,
+      "y": 392,
+      "pop": 105,
+      "fit": 0.9,
+      "icon": "📦",
+      "trait": "成长市场",
+      "links": [
+        "westNA",
+        "eastNA",
+        "northAF"
+      ]
+    },
+    {
+      "id": "westEU",
+      "name": "西欧",
+      "x": 464,
+      "y": 188,
+      "pop": 100,
+      "fit": 0.7,
+      "icon": "⚖️",
+      "trait": "监管严格",
+      "links": [
+        "eastNA",
+        "eastEU",
+        "northAF"
+      ]
+    },
+    {
+      "id": "eastEU",
+      "name": "东欧",
+      "x": 542,
+      "y": 188,
+      "pop": 85,
+      "fit": 0.95,
+      "icon": "🧾",
+      "trait": "外包中心",
+      "links": [
+        "westEU",
+        "northAsia",
+        "southAsia",
+        "northAF"
+      ]
+    },
+    {
+      "id": "northAF",
+      "name": "北非",
+      "x": 477,
+      "y": 313,
+      "pop": 80,
+      "fit": 0.85,
+      "icon": "🚆",
+      "trait": "跨洲门户",
+      "links": [
+        "latam",
+        "westEU",
+        "eastEU",
+        "africa"
+      ]
+    },
+    {
+      "id": "africa",
+      "name": "非洲南部",
+      "x": 500,
+      "y": 413,
+      "pop": 95,
+      "fit": 0.8,
+      "icon": "☀️",
+      "trait": "成长市场",
+      "links": [
+        "northAF",
+        "southAsia"
+      ]
+    },
+    {
+      "id": "northAsia",
+      "name": "北亚",
+      "x": 678,
+      "y": 164,
+      "pop": 75,
+      "fit": 0.65,
+      "icon": "❄️",
+      "trait": "交通稀疏",
+      "links": [
+        "eastEU",
+        "eastAsia"
+      ]
+    },
+    {
+      "id": "southAsia",
+      "name": "南亚",
+      "x": 645,
+      "y": 313,
+      "pop": 140,
+      "fit": 1.1,
+      "icon": "🧑‍💻",
+      "trait": "人才密集",
+      "links": [
+        "eastEU",
+        "africa",
+        "eastAsia",
+        "southeastAsia"
+      ]
+    },
+    {
+      "id": "eastAsia",
+      "name": "东亚",
+      "x": 782,
+      "y": 252,
+      "pop": 150,
+      "fit": 1.1,
+      "icon": "🏢",
+      "trait": "人才密集",
+      "links": [
+        "westNA",
+        "northAsia",
+        "southAsia",
+        "southeastAsia"
+      ]
+    },
+    {
+      "id": "southeastAsia",
+      "name": "东南亚",
+      "x": 750,
+      "y": 365,
+      "pop": 110,
+      "fit": 1,
+      "icon": "🛫",
+      "trait": "远程枢纽",
+      "links": [
+        "southAsia",
+        "eastAsia",
+        "oceania"
+      ]
+    },
+    {
+      "id": "oceania",
+      "name": "大洋洲",
+      "x": 849,
+      "y": 448,
+      "pop": 75,
+      "fit": 0.7,
+      "icon": "🏝️",
+      "trait": "孤岛市场",
+      "links": [
+        "southeastAsia"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "referral",
+      "tab": "spread",
+      "name": "内推海报",
+      "icon": "📌",
+      "cost": 6,
+      "desc": "本地招聘速度 +25%。"
+    },
+    {
+      "id": "headhunt",
+      "tab": "spread",
+      "name": "跨境猎头",
+      "icon": "🧳",
+      "cost": 10,
+      "req": "referral",
+      "desc": "跨地区传播速度 +55%。"
+    },
+    {
+      "id": "remote",
+      "tab": "spread",
+      "name": "远程办公",
+      "icon": "💻",
+      "cost": 15,
+      "req": "headhunt",
+      "desc": "孤岛与远距离地区更容易进入。"
+    },
+    {
+      "id": "campus",
+      "tab": "spread",
+      "name": "全球校招",
+      "icon": "🎓",
+      "cost": 20,
+      "req": "remote",
+      "desc": "所有地区招聘速度 +45%。"
+    },
+    {
+      "id": "coffee",
+      "tab": "culture",
+      "name": "免费咖啡",
+      "icon": "☕",
+      "cost": 7,
+      "desc": "本地招聘稍快，曝光稍高。"
+    },
+    {
+      "id": "flex",
+      "tab": "culture",
+      "name": "弹性工时",
+      "icon": "🕒",
+      "cost": 12,
+      "req": "coffee",
+      "desc": "离职减少，反制增长放缓。"
+    },
+    {
+      "id": "slogan",
+      "tab": "culture",
+      "name": "狼性口号",
+      "icon": "🐺",
+      "cost": 11,
+      "req": "coffee",
+      "desc": "招聘大幅加快，但员工更易离职、曝光飙升。"
+    },
+    {
+      "id": "shares",
+      "tab": "culture",
+      "name": "员工持股",
+      "icon": "📈",
+      "cost": 18,
+      "req": "flex",
+      "desc": "高覆盖阶段留存更稳。"
+    },
+    {
+      "id": "local",
+      "tab": "adapt",
+      "name": "本地化合同",
+      "icon": "📝",
+      "cost": 8,
+      "desc": "监管严格地区更容易招聘。"
+    },
+    {
+      "id": "legal",
+      "tab": "adapt",
+      "name": "法务团队",
+      "icon": "🛡️",
+      "cost": 13,
+      "req": "local",
+      "desc": "全球反制增长放缓。"
+    },
+    {
+      "id": "roundtable",
+      "tab": "adapt",
+      "name": "员工圆桌会",
+      "icon": "🪑",
+      "cost": 16,
+      "req": "local",
+      "desc": "反制较高时帮助缓和局势。"
+    },
+    {
+      "id": "globalHR",
+      "tab": "adapt",
+      "name": "全球人事部",
+      "icon": "🌐",
+      "cost": 21,
+      "req": "legal",
+      "desc": "招聘与留存同时改善。"
+    }
+  ],
+  "events": [
+    {
+      "day": 210,
+      "title": "第一封跨国简历到了",
+      "body": "总部发现员工把招聘海报传到了海的另一边。市场很兴奋，法务也很兴奋。",
+      "choices": [
+        {
+          "name": "给员工发内推奖金",
+          "detail": "招聘点 +4 · 曝光 +5",
+          "points": 4,
+          "awareness": 5
+        },
+        {
+          "name": "先让法务看一眼",
+          "detail": "全球反制 -5 · 招聘点 +1",
+          "resistance": -5,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "day": 430,
+      "title": "“自愿加班”上了热搜",
+      "body": "人事部坚持说这是一场关于时间管理的误会。员工们并不这么认为。",
+      "choices": [
+        {
+          "name": "公开改成弹性工时",
+          "detail": "反制 -10 · 曝光 -5",
+          "resistance": -10,
+          "awareness": -5
+        },
+        {
+          "name": "把热搜也当招聘广告",
+          "detail": "招聘点 +7 · 反制 +12",
+          "points": 7,
+          "resistance": 12
+        }
+      ]
+    },
+    {
+      "day": 680,
+      "title": "各地员工开始互相认识",
+      "body": "他们建了一个群。群名叫“今天也要准点下班”。",
+      "choices": [
+        {
+          "name": "安排公开圆桌会",
+          "detail": "反制 -12 · 招聘点 -3",
+          "resistance": -12,
+          "points": -3
+        },
+        {
+          "name": "推出全球统一工牌",
+          "detail": "招聘点 +6 · 曝光 +8",
+          "points": 6,
+          "awareness": 8
+        }
+      ]
+    },
+    {
+      "day": 940,
+      "title": "监管部门寄来一沓表格",
+      "body": "表格第一题：你们到底在多少个地区招聘？人事部写到一半没笔了。",
+      "choices": [
+        {
+          "name": "认真填写，顺便买笔",
+          "detail": "反制 -14 · 招聘点 -4",
+          "resistance": -14,
+          "points": -4
+        },
+        {
+          "name": "回复一张团队合照",
+          "detail": "招聘点 +5 · 反制 +15",
+          "points": 5,
+          "resistance": 15
+        }
+      ]
+    }
+  ]
+}
