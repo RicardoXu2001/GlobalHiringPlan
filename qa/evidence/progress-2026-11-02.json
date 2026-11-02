@@ -1,0 +1,66 @@
+{
+  "kind": "development-progress-review",
+  "reviewDate": "2026-11-02",
+  "timezone": "Asia/Hong_Kong",
+  "branch": "develop",
+  "head": "f5d484f",
+  "scope": "本地代码、文档与机制回归；未重新进行窗口交互验收，未联网确认远端状态。",
+  "sourceHashes": {
+    "godot/main.gd": "C4F4A6D71AD1C88A1A176D67160DF08642DEA6F541507C6A99374AD85E504EEF",
+    "godot/simulation.gd": "B691A4B07C270BAF4FBACCFF760CCE71EA859560E21BB76451A06775718105EC",
+    "godot/main.tscn": "1A7AC802B80DB3132C077960251A78F789ECA08EDEC01B0E1DA586CCF6D2CC12",
+    "godot/project.godot": "7A5CB29ADA17535103EA9F7B6CBCEC35D5BFE339CDAB8361E68E84732E9D2FB0",
+    "godot/data/content.json": "DED6BA7807533AE9A6937B8E4786354780D555C6B255748C62F00F238A4DC79B",
+    "godot/tests/verify.gd": "0414EC8A77B60D7E3734FA39341EF541FF16C98DA5F0085DD944C9BAA07DB586",
+    "浏览器原型.html": "C1614DCDC6FB729E3CAD03E7AC8DCF2F93395DB7E7ECC3FB943F7C8AE74BD986",
+    "验证原型.cjs": "983016100A5B089E9CEA8D1D2836AFBB87A3157272D68E6D5891F4F550B8D9D2"
+  },
+  "regressions": [
+    {
+      "target": "Godot simulation",
+      "command": "& ./godot/验证.ps1 -Godot 'C:/Users/xudic/Desktop/R/Game/Godot_v4.5.1-stable_win64.exe'",
+      "exitCode": 0,
+      "result": {
+        "engine": "4.5.1-stable (official)",
+        "failures": [],
+        "recklessRouteDay": 941,
+        "runtime": "Godot Windows headless",
+        "scope": "模拟与存档回归；不证明真实画面、系统输入或导出包",
+        "stableRouteDay": 1230,
+        "status": "PASS"
+      }
+    },
+    {
+      "target": "Browser prototype via Node VM and mocked DOM",
+      "command": "node 验证原型.cjs",
+      "exitCode": 0,
+      "result": {
+        "status": "PASS",
+        "stableRouteDay": 1233,
+        "recklessRouteDay": 941,
+        "coveredRegions": 12,
+        "stableRouteResistancePercent": 39,
+        "scope": "脚本与模拟交互检查；未在真实浏览器中重新试玩。"
+      }
+    }
+  ],
+  "historicalUIEvidence": {
+    "date": "2026-10-13",
+    "path": "qa/evidence/ui.json",
+    "sourceHashMatches": true,
+    "rerunThisReview": false,
+    "scope": "原生窗口失败结算与重开；真人完整获胜和节奏未验证。"
+  },
+  "localDelivery": {
+    "engineVersion": "4.5.1",
+    "exportPresetsExist": false,
+    "windowsBuildExists": false,
+    "ciWorkflowExists": false
+  },
+  "limitations": [
+    "现金、工资、订单回款、贷款、危机与经营方针未接入。",
+    "独立 Windows 包及另一台未安装 Godot 的机器未验证。",
+    "未重新验证真实窗口、真人完整获胜、20–25 分钟节奏或两种分辨率。",
+    "远端分支、main 保护与 Steam 账户/发行状态未联网核实。"
+  ]
+}

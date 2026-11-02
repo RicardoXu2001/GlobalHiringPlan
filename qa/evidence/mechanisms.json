@@ -1,9 +1,20 @@
 {
+	"automationDay": 82,
 	"engine": "4.5.1-stable (official)",
 	"failures": [],
+	"firstHireDay": 62,
 	"recklessRouteDay": 941,
 	"runtime": "Godot Windows headless",
-	"scope": "模拟与存档回归；不证明真实画面、系统输入或导出包",
-	"stableRouteDay": 1230,
-	"status": "PASS"
+	"scope": "机制与场景逻辑；真实画面和系统输入须由原生窗口证据补充",
+	"stableRouteDay": 1317,
+	"status": "PASS",
+	"suites": [
+		"OPC接单/工具/首雇/自动化与招聘",
+		"订单偏好回退、额度耗尽/周刷新、资金不足与等待提示",
+		"现金守恒、同日回款、工资与三周预估",
+		"普通/延期/过度扩张、固定救援期限",
+		"暂停/快进/事件/财务面板",
+		"订单/应收/随机存档、防重复与坏档保护",
+		"全地图胜负与重开"
+	]
 }

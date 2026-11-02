@@ -1,9 +1,9 @@
-; Godot 4.5.1 / Windows 单人起步版
+; Godot 4.5.1 / OPC 与现金流原型
 config_version=5
 
 [application]
-config/name="牛马公司 · 招聘原型"
-config/version="0.1.0"
+config/name="牛马公司 · OPC与现金流原型"
+config/version="0.2.1"
 run/main_scene="res://main.tscn"
 
 [display]

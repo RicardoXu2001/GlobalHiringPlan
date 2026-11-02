@@ -1,4 +1,25 @@
 {
+  "economy": {
+    "weekDays": 60,
+    "company": {"id": "opc", "name": "一人公司 OPC", "initialCash": 4000},
+    "baseCost": 600,
+    "regionCost": 200,
+    "weeklyWage": 600,
+    "hireCost": 18000,
+    "founderRate": 1.0,
+    "workerRate": 0.6,
+    "demandPerResident": 3,
+    "graceWeeks": 2
+  },
+  "tools": [
+    {"id": "desk", "name": "高效工作台", "cost": 6000, "desc": "创始人工作效率翻倍，解锁批量单与企业单。"},
+    {"id": "workflow", "name": "接单流程", "cost": 12000, "desc": "首雇后自动接单；可切换业务偏好，随时暂停新单。", "req": "desk"}
+  ],
+  "orders": [
+    {"id": "quick", "name": "整理客户表格", "work": 12, "reward": 3000, "fee": 0, "delay": 0, "desc": "短单 · 交付即到账"},
+    {"id": "batch", "name": "批量资料整理", "work": 36, "reward": 10500, "fee": 500, "delay": 15, "req": "desk", "desc": "批量单 · 交付后15日到账"},
+    {"id": "enterprise", "name": "企业数据服务", "work": 90, "reward": 30000, "fee": 2000, "delay": 60, "req": "desk", "desc": "企业单 · 交付后1财务周到账"}
+  ],
   "regions": [
     {
       "id": "westNA",

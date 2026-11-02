@@ -1,0 +1,43 @@
+{
+  "sourceHash": "8A6DD39E857847379D1B4D5F5D57ECCBBF834C14CA691B14EE8A68E54F666CD2|F1B1E426657C409A0EA0DC520B0859DCE1DF3C90F9042FE01C65EFC1E2CB1F77|1A7AC802B80DB3132C077960251A78F789ECA08EDEC01B0E1DA586CCF6D2CC12|B7993DD871E62308F179EF5DAD97994168B0B97DF39E293C2D88D87AC4FBBD7C|5634B2EE329C48D8A35CB2A78C6144073629C7A8B330DF95A1FFDD3BF27A03E2",
+  "runtime": "Godot 4.5.1 Windows 原生窗口 / OpenGL NVIDIA RTX 4060 Laptop",
+  "input": "@oai/sky 系统鼠标与键盘",
+  "date": "2026-11-02",
+  "checks": {
+    "launch": "PASS",
+    "render": "PASS",
+    "input": "PASS",
+    "coreLoop": "PASS",
+    "outcome": "PASS",
+    "restart": "PASS"
+  },
+  "steps": [
+    "新局：创始人1、雇员0、现金40元",
+    "鼠标接短单，开工，空格暂停/继续，交付只增加一次现金",
+    "现金60元买工作台，批量单交付形成105元应收；财务阅读暂停，到期才到账",
+    "企业单启动费20元，交付300元应收在60日后到账",
+    "首雇180元、接单流程120元，开启自动接单及地图招聘",
+    "创始人停工，员工自动交付，现金和招聘人数增加；原内推海报可购买",
+    "第600日暂停退出再启动，订单进度、现金65563分、26单、工资状态、自动化与随机状态逐字段一致",
+    "停止自动接新单，保留招聘和工资；第1020日现金0、欠款311175分、27单，进入财务失败",
+    "鼠标重新创业：第0日、现金4000分、零雇员、无工具/应收/订单"
+  ],
+  "trace": "qa/evidence/v02-trace.json",
+  "screenshots": [
+    "qa/evidence/v02-start.jpg",
+    "qa/evidence/v02-first-payment.jpg",
+    "qa/evidence/v02-finance.jpg",
+    "qa/evidence/v02-automation.jpg",
+    "qa/evidence/v02-world.jpg",
+    "qa/evidence/v02-outcome.jpg",
+    "qa/evidence/v02-restart.jpg"
+  ],
+  "completeRun": {
+    "id": "native-opc-cashflow-failure",
+    "cleanContext": true,
+    "terminal": "designed-outcome",
+    "restart": "initial-state",
+    "evidence": "qa/evidence/run.json"
+  },
+  "limitation": "真实输入验证财务失败路线；全地图胜利只在机制演练中验证。实际真人节奏、1920×1080专项、独立包/干净机器、贷款/危机/方针待开展。OPC久驻后首雇会补弹全局日已到期事件。"
+}
