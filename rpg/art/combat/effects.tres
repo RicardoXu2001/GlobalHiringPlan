@@ -1,0 +1,208 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/combat/sweep.png" id="sweep"]
+
+[ext_resource type="Texture2D" path="res://art/combat/pulse.png" id="pulse"]
+
+[ext_resource type="Texture2D" path="res://art/combat/arc_hit.png" id="arc_hit"]
+
+[ext_resource type="Texture2D" path="res://art/combat/probe_hit.png" id="probe_hit"]
+
+[ext_resource type="Texture2D" path="res://art/combat/guard.png" id="guard"]
+
+[sub_resource type="AtlasTexture" id="sweep_0"]
+atlas = ExtResource("sweep")
+region = Rect2(0, 0, 128, 128)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="sweep_1"]
+atlas = ExtResource("sweep")
+region = Rect2(128, 0, 128, 128)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="sweep_2"]
+atlas = ExtResource("sweep")
+region = Rect2(256, 0, 128, 128)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="sweep_3"]
+atlas = ExtResource("sweep")
+region = Rect2(0, 128, 128, 128)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="sweep_4"]
+atlas = ExtResource("sweep")
+region = Rect2(128, 128, 128, 128)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="sweep_5"]
+atlas = ExtResource("sweep")
+region = Rect2(256, 128, 128, 128)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="sweep_6"]
+atlas = ExtResource("sweep")
+region = Rect2(0, 256, 128, 128)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="sweep_7"]
+atlas = ExtResource("sweep")
+region = Rect2(128, 256, 128, 128)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pulse_0"]
+atlas = ExtResource("pulse")
+region = Rect2(0, 0, 128, 24)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pulse_1"]
+atlas = ExtResource("pulse")
+region = Rect2(128, 0, 128, 24)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pulse_2"]
+atlas = ExtResource("pulse")
+region = Rect2(0, 24, 128, 24)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pulse_3"]
+atlas = ExtResource("pulse")
+region = Rect2(128, 24, 128, 24)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pulse_4"]
+atlas = ExtResource("pulse")
+region = Rect2(0, 48, 128, 24)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pulse_5"]
+atlas = ExtResource("pulse")
+region = Rect2(128, 48, 128, 24)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_hit_0"]
+atlas = ExtResource("arc_hit")
+region = Rect2(0, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_hit_1"]
+atlas = ExtResource("arc_hit")
+region = Rect2(64, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_hit_2"]
+atlas = ExtResource("arc_hit")
+region = Rect2(128, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_hit_3"]
+atlas = ExtResource("arc_hit")
+region = Rect2(192, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_hit_4"]
+atlas = ExtResource("arc_hit")
+region = Rect2(0, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_hit_5"]
+atlas = ExtResource("arc_hit")
+region = Rect2(64, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_hit_6"]
+atlas = ExtResource("arc_hit")
+region = Rect2(128, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_hit_7"]
+atlas = ExtResource("arc_hit")
+region = Rect2(192, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_hit_8"]
+atlas = ExtResource("arc_hit")
+region = Rect2(0, 128, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="probe_hit_0"]
+atlas = ExtResource("probe_hit")
+region = Rect2(0, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="probe_hit_1"]
+atlas = ExtResource("probe_hit")
+region = Rect2(64, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="probe_hit_2"]
+atlas = ExtResource("probe_hit")
+region = Rect2(128, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="probe_hit_3"]
+atlas = ExtResource("probe_hit")
+region = Rect2(192, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="probe_hit_4"]
+atlas = ExtResource("probe_hit")
+region = Rect2(0, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="probe_hit_5"]
+atlas = ExtResource("probe_hit")
+region = Rect2(64, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="probe_hit_6"]
+atlas = ExtResource("probe_hit")
+region = Rect2(128, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="probe_hit_7"]
+atlas = ExtResource("probe_hit")
+region = Rect2(192, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="probe_hit_8"]
+atlas = ExtResource("probe_hit")
+region = Rect2(0, 128, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="guard_0"]
+atlas = ExtResource("guard")
+region = Rect2(0, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="guard_1"]
+atlas = ExtResource("guard")
+region = Rect2(64, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="guard_2"]
+atlas = ExtResource("guard")
+region = Rect2(128, 0, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="guard_3"]
+atlas = ExtResource("guard")
+region = Rect2(0, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="guard_4"]
+atlas = ExtResource("guard")
+region = Rect2(64, 64, 64, 64)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="guard_5"]
+atlas = ExtResource("guard")
+region = Rect2(128, 64, 64, 64)
+filter_clip = true
+
+[resource]
+animations = [{"frames": [{"duration": 1.0, "texture": SubResource("sweep_0")}, {"duration": 1.0, "texture": SubResource("sweep_1")}, {"duration": 1.0, "texture": SubResource("sweep_2")}, {"duration": 1.0, "texture": SubResource("sweep_3")}, {"duration": 1.0, "texture": SubResource("sweep_4")}, {"duration": 1.0, "texture": SubResource("sweep_5")}, {"duration": 1.0, "texture": SubResource("sweep_6")}, {"duration": 1.0, "texture": SubResource("sweep_7")}], "loop": false, "name": &"sweep", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("pulse_0")}, {"duration": 1.0, "texture": SubResource("pulse_1")}, {"duration": 1.0, "texture": SubResource("pulse_2")}, {"duration": 1.0, "texture": SubResource("pulse_3")}, {"duration": 1.0, "texture": SubResource("pulse_4")}, {"duration": 1.0, "texture": SubResource("pulse_5")}], "loop": false, "name": &"pulse", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("arc_hit_0")}, {"duration": 1.0, "texture": SubResource("arc_hit_1")}, {"duration": 1.0, "texture": SubResource("arc_hit_2")}, {"duration": 1.0, "texture": SubResource("arc_hit_3")}, {"duration": 1.0, "texture": SubResource("arc_hit_4")}, {"duration": 1.0, "texture": SubResource("arc_hit_5")}, {"duration": 1.0, "texture": SubResource("arc_hit_6")}, {"duration": 1.0, "texture": SubResource("arc_hit_7")}, {"duration": 1.0, "texture": SubResource("arc_hit_8")}], "loop": false, "name": &"arc_hit", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("probe_hit_0")}, {"duration": 1.0, "texture": SubResource("probe_hit_1")}, {"duration": 1.0, "texture": SubResource("probe_hit_2")}, {"duration": 1.0, "texture": SubResource("probe_hit_3")}, {"duration": 1.0, "texture": SubResource("probe_hit_4")}, {"duration": 1.0, "texture": SubResource("probe_hit_5")}, {"duration": 1.0, "texture": SubResource("probe_hit_6")}, {"duration": 1.0, "texture": SubResource("probe_hit_7")}, {"duration": 1.0, "texture": SubResource("probe_hit_8")}], "loop": false, "name": &"probe_hit", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("guard_0")}, {"duration": 1.0, "texture": SubResource("guard_1")}, {"duration": 1.0, "texture": SubResource("guard_2")}, {"duration": 1.0, "texture": SubResource("guard_3")}, {"duration": 1.0, "texture": SubResource("guard_4")}, {"duration": 1.0, "texture": SubResource("guard_5")}], "loop": false, "name": &"guard", "speed": 30.0}]

@@ -1,0 +1,147 @@
+{
+  "qa": {
+    "completeRun": {
+      "id": "native-rebuild",
+      "cleanContext": true,
+      "terminal": "b17-record-reached",
+      "restart": "initial-state",
+      "evidence": "qa/run.json"
+    },
+    "exitCode": 0,
+    "command": "& ./rpg/验证.ps1",
+    "checks": {
+      "launch": "PASS",
+      "render": "PASS",
+      "input": "PASS",
+      "coreLoop": "PASS",
+      "outcome": "PASS",
+      "restart": "PASS"
+    }
+  },
+  "runtime": "4.5.1-stable (official)",
+  "renderer": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "viewport": "(1280, 720)",
+  "checkpoints": [
+    {
+      "boss_hp": 24,
+      "cycle": 1,
+      "hp": 5,
+      "id": "first-visit-bypass-denied",
+      "module": "",
+      "room": "intake",
+      "screen": "play",
+      "stage": 0
+    },
+    {
+      "boss_hp": 24,
+      "cycle": 1,
+      "hp": 5,
+      "id": "probe-missed",
+      "module": "probe",
+      "room": "press",
+      "screen": "play",
+      "stage": 0
+    },
+    {
+      "boss_hp": 24,
+      "cycle": 1,
+      "hp": 5,
+      "id": "probe-blocked",
+      "module": "probe",
+      "room": "press",
+      "screen": "play",
+      "stage": 0
+    },
+    {
+      "boss_hp": 0,
+      "cycle": 1,
+      "hp": 5,
+      "id": "press-stopped",
+      "module": "probe",
+      "room": "press",
+      "screen": "play",
+      "stage": 0
+    },
+    {
+      "boss_hp": 24,
+      "cycle": 2,
+      "hp": 5,
+      "id": "rewind-committed",
+      "module": "",
+      "room": "intake",
+      "screen": "play",
+      "stage": 2
+    },
+    {
+      "boss_hp": 24,
+      "cycle": 2,
+      "hp": 5,
+      "id": "b17-record-reached",
+      "module": "",
+      "room": "bypass",
+      "screen": "complete",
+      "stage": 3
+    },
+    {
+      "boss_hp": 24,
+      "cycle": 1,
+      "hp": 5,
+      "id": "new-run",
+      "module": "",
+      "room": "intake",
+      "screen": "play",
+      "stage": 0
+    },
+    {
+      "boss_hp": 24,
+      "cycle": 1,
+      "hp": 0,
+      "id": "failed-by-standing-still",
+      "module": "arc",
+      "room": "press",
+      "screen": "failed",
+      "stage": 0
+    },
+    {
+      "boss_hp": 24,
+      "cycle": 1,
+      "hp": 5,
+      "id": "retry-first-round",
+      "module": "",
+      "room": "intake",
+      "screen": "play",
+      "stage": 0
+    },
+    {
+      "boss_hp": 0,
+      "cycle": 1,
+      "hp": 5,
+      "id": "arc-stopped-machine",
+      "module": "arc",
+      "room": "press",
+      "screen": "play",
+      "stage": 0
+    },
+    {
+      "boss_hp": 0,
+      "cycle": 1,
+      "hp": 5,
+      "id": "reduced-motion-attack",
+      "module": "arc",
+      "room": "press",
+      "screen": "play",
+      "stage": 0
+    }
+  ],
+  "frames": [
+    "title.png",
+    "exploration.png",
+    "weapons.png",
+    "combat.png",
+    "combat-block.png",
+    "combat-probe.png",
+    "outcome.png",
+    "combat-arc.png"
+  ],
+  "error": ""
+}
