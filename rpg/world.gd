@@ -20,6 +20,14 @@ const PRESS = preload("res://art/press.png")
 const CUTTER = preload("res://art/combat/cutter.png")
 const RANGEFINDER = preload("res://art/combat/rangefinder.png")
 const COMBAT_FX: SpriteFrames = preload("res://art/combat/effects.tres")
+const EXP_FX: SpriteFrames = preload("res://art/expedition/effects.tres")
+const HEART = preload("res://art/expedition/heart.png")
+const EXP_ROOMS = [preload("res://art/expedition/field0.png"), preload("res://art/expedition/field1.png"), preload("res://art/expedition/field2.png")]
+const HUB = preload("res://art/expedition/hub.png")
+const BIO_BOSS = preload("res://art/expedition/boss.png")
+const PREVIEW = preload("res://art/expedition/preview.png")
+const CREATURES = {"husk": preload("res://art/expedition/husk.png"), "worker": preload("res://art/expedition/worker.png"), "sentinel": preload("res://art/expedition/sentinel.png")}
+const WEAPONS = {"arc": preload("res://art/expedition/weapon-arc.png"), "probe": preload("res://art/expedition/weapon-probe.png"), "nailer": preload("res://art/expedition/weapon-nailer.png")}
 
 var game
 var light: GradientTexture2D
@@ -95,6 +103,22 @@ func _draw() -> void:
 	if title:
 		room = "bypass"
 	match room:
+		"hub":
+			draw_texture(HUB, Vector2.ZERO)
+			terminal(game.SHOP, true, CYAN)
+			terminal(game.DEPART, true, AMBER)
+			terminal(game.GRAFT, game.organ, CYAN)
+			if game.integrated:
+				var pulse := 1 if game.heartbeat_left > 0.7 and not game.reduced_motion else 0
+				draw_texture_rect(HEART, Rect2(297 - pulse, 60 - pulse, 48 + pulse * 2, 48 + pulse * 2), false)
+				halo(Vector2(320, 85), 9, RED)
+			if game.graft_age >= 0 and game.graft_age < 1.4:
+				expedition_effect(&"organ_collect", game.graft_age, game.GRAFT)
+		"field":
+			draw_texture(PREVIEW if game.stage == 5 else EXP_ROOMS[game.stage], Vector2.ZERO)
+			field_enemies()
+			gate(500, game.cleared)
+			if game.cleared: bracket(game.EXIT, AMBER)
 		"intake":
 			draw_texture(RETURN if game.cycle > 1 else INTAKE, Vector2.ZERO)
 			gate(171, game.cycle > 1)
@@ -110,12 +134,16 @@ func _draw() -> void:
 				block(p.x + 4, p.y, 4, 2, AMBER)
 			terminal(game.TERMINAL, game.cycle == 1, CYAN)
 		"press":
-			draw_texture(HALL, Vector2.ZERO)
-			if game.boss_phase in ["warn", "strike"]:
+			draw_texture(BIO_BOSS if game.campaign else HALL, Vector2.ZERO)
+			if game.hp > 0 and game.boss_phase in ["warn", "strike"]:
 				var opacity := 0.34 if game.boss_phase == "strike" else 0.13
 				draw_rect(game.hazard, Color(RED, opacity))
+			boss_attack()
 			press()
-			if game.boss_hp == 0:
+			if game.campaign and game.boss_hp == 0:
+				gate(500, true)
+				bracket(game.EXIT, AMBER)
+			elif game.boss_hp == 0:
 				terminal(game.LOG_POINT, not game.log_read, CYAN)
 		"bypass":
 			draw_texture(BYPASS, Vector2.ZERO)
@@ -126,20 +154,50 @@ func _draw() -> void:
 		draw_texture(PRESS, Vector2(347, 98))
 		draw_worker(Vector2(412, 256), 0, 0, false)
 		return
+	if game.screen in ["dying", "failed"]:
+		draw_downed()
+		return
 	if game.hint_pos != Vector2.ZERO:
 		bracket(game.hint_pos, CYAN)
 	if game.attack_age >= 0:
 		attack()
+	if game.campaign:
+		for fx in game.effects:
+			expedition_effect(fx.id, fx.age, fx.p)
+		# Draw danger boundaries after decorative particles, before the player.
+		for e in game.enemies:
+			if e.hp > 0 and e.phase in ["warn", "strike"]:
+				draw_rect(e.zone.grow(1), INK, false, 3)
+				draw_rect(e.zone, RED, false, 2)
+				draw_line(e.zone.position + Vector2(4, 4), e.zone.end - Vector2(4, 4), RED, 1)
 	if room == "press" and game.boss_phase in ["warn", "strike"]:
 		hazard()
 	if game.dash_left > 0 and not game.reduced_motion:
-		block(game.player.x - game.dash_dir.x * 13 - 7, game.player.y - 8, 14, 2, TEAL)
+		for i in game.dash_trail.size():
+			var ghost: Vector2 = game.dash_trail[i]
+			draw_texture_rect_region(WORKER, Rect2(ghost - Vector2(16, 42), Vector2(32, 44)),
+				Rect2(0, game.face_index * 48, 32, 48), Color(CYAN, 0.05 + i * 0.04))
+	if game.dash_age >= 0 and not game.reduced_motion:
+		draw_effect(&"dash", game.dash_age, game.player - Vector2(0, 8),
+			game.dash_dir.angle(), Vector2(60, 24))
+	if game.evade_flash > 0:
+		if not game.reduced_motion:
+			draw_effect(&"evade", 0.35 - game.evade_flash, game.evade_point, 0, Vector2(32, 24))
+		else:
+			draw_rect(Rect2(game.player - Vector2(14, 36), Vector2(28, 37)), CYAN, false, 1)
 	var pose: int = int(game.walk_clock * 10.0) % 6 if game.moving else 0
 	var p: Vector2 = game.player.round()
 	var dir: Vector2 = game.facing
 	var acting: bool = game.attack_windup > 0 or (game.attack_age >= 0 and game.attack_age < 0.16)
 	var body_offset := Vector2.ZERO
-	if acting and not game.reduced_motion:
+	if game.hurt_age >= 0 and not game.reduced_motion:
+		pose = 2
+		var settle: float = 1.0 - clampf((game.hurt_age - 0.05) / 0.22, 0, 1)
+		body_offset = game.hurt_direction * 6.0 * settle + Vector2(0, 2)
+	elif game.dash_left > 0 and not game.reduced_motion:
+		pose = 2
+		body_offset = Vector2(0, 3) + game.dash_dir * 3
+	elif acting and not game.reduced_motion:
 		dir = game.attack_direction
 		var kick := -2.0 if game.build_id == "probe" else 3.0
 		body_offset = dir * (-2.0 if game.attack_windup > 0 else kick * (1.0 - maxf(0, game.attack_age - 0.05) / 0.16))
@@ -149,14 +207,67 @@ func _draw() -> void:
 	draw_worker((p + body_offset).round(), game.face_index, pose, game.hurt_flash > 0, p)
 	if dir.y >= -0.7:
 		draw_weapon(p + body_offset, dir, acting)
+	if game.hurt_age >= 0:
+		if not game.reduced_motion:
+			draw_effect(&"player_hurt", game.hurt_age, p + body_offset - Vector2(0, 22),
+				game.hurt_direction.angle(), Vector2(32, 32))
+
+func draw_downed() -> void:
+	var age: float = game.death_age
+	var p: Vector2 = game.player.round()
+	var side: float = game.death_side
+	var turn := clampf((age - 0.10) / 0.24, 0, 1)
+	turn = turn * turn * (3 - 2 * turn)
+	if game.reduced_motion:
+		turn = 1.0 if age >= 0.16 else 0.0
+	var shade := Color.WHITE.lerp(Color(0.42, 0.48, 0.52), clampf((age - 0.35) / 0.4, 0, 1))
+	block(p.x - 12, p.y - 2, 24, 5, INK)
+	if turn > 0.5:
+		draw_line(p, p + Vector2(side * 38, 0), INK, 9)
+	draw_set_transform(p + Vector2(side * turn * 2, 0), side * PI * 0.5 * turn)
+	draw_texture_rect_region(WORKER, Rect2(-16, -44, 32, 48),
+		Rect2(0, game.face_index * 48, 32, 48), shade)
+	draw_set_transform(Vector2.ZERO)
+	if age < 0.2 and not game.reduced_motion:
+		draw_effect(&"player_hurt", age, p - Vector2(0, 22), 0, Vector2(32, 32))
+	if age >= 0.32:
+		var landing := p + Vector2(side * 20, 0)
+		if not game.reduced_motion:
+			draw_effect(&"collapse", age - 0.32, landing, 0, Vector2(48, 24))
+		draw_set_transform(p + Vector2(-side * 15, 4), side * 0.35)
+		draw_texture(WEAPONS[game.build_id] if game.campaign else (CUTTER if game.build_id == "arc" else RANGEFINDER), Vector2(-12, -12), shade)
+		draw_set_transform(Vector2.ZERO)
+
+func boss_attack() -> void:
+	if game.hp <= 0:
+		return
+	var r: Rect2 = game.hazard
+	if game.boss_phase == "warn":
+		var progress: float = 1.0 - game.boss_time / 0.85
+		var inset := 3.0 + 15.0 * (1.0 - progress)
+		draw_rect(r.grow(-inset), Color(RED, 0.5), false, 1)
+		for side in [-1, 1]:
+			var y: float = game.CORE.y - 49 - 6 * progress
+			block(game.CORE.x + side * 35 - 2, y, 4, 8, RED)
+	if game.boss_fx_age < 0:
+		return
+	if game.reduced_motion:
+		if game.boss_phase == "strike":
+			draw_line(r.position + Vector2(4, 4), r.end - Vector2(4, 4), MIST, 2)
+		return
+	if r.size.x > 100:
+		draw_effect(&"boss_sweep", game.boss_fx_age, r.get_center(), 0, Vector2(120, 56))
+	else:
+		draw_effect(&"boss_slam", game.boss_fx_age, r.get_center(), 0, Vector2(40, 96))
 
 func draw_worker(p: Vector2, direction: int, pose: int, hit: bool, feet := Vector2.INF) -> void:
 	var anchor := p if feet == Vector2.INF else feet
 	block(anchor.x - 12, anchor.y - 2, 24, 5, INK)
 	halo(p + Vector2(-4, -22), 6, CYAN)
 	draw_texture_rect_region(WORKER, Rect2(p - Vector2(16, 44), Vector2(32, 48)),
-		Rect2(pose * 32, direction * 48, 32, 48))
-	if hit:
+		Rect2(pose * 32, direction * 48, 32, 48),
+		Color(1.4, 0.55, 0.6) if hit and not game.reduced_motion else Color.WHITE)
+	if hit and game.reduced_motion:
 		draw_rect(Rect2(p.x - 13, p.y - 36, 26, 38), RED, false, 1)
 
 func draw_weapon(p: Vector2, dir: Vector2, acting: bool) -> void:
@@ -171,22 +282,51 @@ func draw_weapon(p: Vector2, dir: Vector2, acting: bool) -> void:
 			angle += lerpf(-0.45, 0.96, minf(1, game.attack_age / 0.07))
 	var grip := (p + Vector2(0, -14) + dir * 12).round()
 	draw_set_transform(grip, angle)
-	draw_texture(CUTTER if arc else RANGEFINDER, Vector2(-7, -12))
+	if game.campaign:
+		draw_texture(WEAPONS[game.build_id], Vector2(-12, -16))
+	else:
+		draw_texture(CUTTER if arc else RANGEFINDER, Vector2(-7, -12))
 	draw_set_transform(Vector2.ZERO)
 
 func press() -> void:
 	var p: Vector2 = game.CORE
 	var lift := 0
-	if game.boss_phase == "open":
+	if game.boss_phase == "warn" and not game.reduced_motion:
+		lift = roundi(3 + 5 * (1.0 - game.boss_time / 0.85))
+	elif game.boss_phase == "open":
 		lift = 5
 	elif game.boss_phase == "strike":
 		lift = -4
 	block(p.x - 40, p.y - 2, 80, 8, INK)
 	var recoil := Vector2.ZERO
-	if not game.reduced_motion and game.attack_result == "hit" and game.attack_age >= 0 and game.attack_age < 0.12:
-		recoil = (game.attack_direction * 3.0 * (1.0 - game.attack_age / 0.12)).round()
+	if not game.reduced_motion and game.boss_hurt_age >= 0 and game.boss_hurt_age < 0.20:
+		var settle: float = 1.0 - clampf((game.boss_hurt_age - 0.045) / 0.15, 0, 1)
+		recoil = (game.boss_hurt_direction * 4.0 * settle).round()
+	var tint := Color(0.66, 0.68, 0.72) if game.boss_hp == 0 else Color.WHITE
+	if not game.reduced_motion and game.boss_hurt_age >= 0 and game.boss_hurt_age < 0.067:
+		tint = Color(1.5, 1.5, 1.4)
 	draw_texture(PRESS, p - Vector2(48, 84 + lift) + recoil,
-		Color(0.66, 0.68, 0.72) if game.boss_hp == 0 else Color.WHITE)
+		tint)
+	if game.campaign:
+		for side in [-1, 1]:
+			var elbow := p + Vector2(side * 65, -30 - lift)
+			draw_line(p + Vector2(side * 36, -54), elbow, INK, 10)
+			draw_line(p + Vector2(side * 36, -54), elbow, SLATE, 6)
+			draw_line(elbow, p + Vector2(side * 75, -2), STEEL, 9)
+			block(p.x + side * 75 - 12, p.y - 10, 24, 13, SLATE)
+		draw_texture_rect(HEART, Rect2(p - Vector2(24, 69 + lift) + recoil, Vector2(48, 48)), false, tint)
+	if game.boss_hp <= 16:
+		draw_polyline(PackedVector2Array([p + Vector2(-22, -47), p + Vector2(-25, -37),
+			p + Vector2(-20, -30), p + Vector2(-23, -19)]), MIST, 1)
+	if game.boss_hp <= 8:
+		draw_polyline(PackedVector2Array([p + Vector2(22, -40), p + Vector2(17, -31),
+			p + Vector2(21, -24), p + Vector2(17, -14)]), MIST, 1)
+	if game.boss_hurt_age >= 0:
+		if game.reduced_motion:
+			draw_rect(Rect2(p - Vector2(14, 32), Vector2(28, 23)), BONE, false, 2)
+		else:
+			draw_effect(&"boss_hurt", game.boss_hurt_age, p - Vector2(0, 20),
+				game.boss_hurt_direction.angle(), Vector2(48, 40))
 	if game.boss_hp == 0:
 		return
 	var lamp := RED if game.boss_phase in ["warn", "strike"] else (CYAN if lift == 5 else TEAL)
@@ -211,9 +351,9 @@ func hazard() -> void:
 func attack() -> void:
 	var p: Vector2 = game.attack_origin
 	var dir: Vector2 = game.attack_direction
-	var probe: bool = game.build_id == "probe"
+	var probe: bool = game.build_id != "arc"
 	var age: float = game.attack_age
-	var impact: Vector2 = game.CORE - Vector2(0, 10)
+	var impact: Vector2 = game.attack_contact
 	if game.reduced_motion:
 		if age < 0.11:
 			if probe:
@@ -230,6 +370,8 @@ func attack() -> void:
 	if probe:
 		draw_effect(&"pulse", age, p, dir.angle(), Vector2(12, 12),
 			Vector2(game.attack_distance / 108.0, 1.0))
+		if game.campaign and game.build_id == "nailer" and age < 0.07:
+			draw_line(p, p + dir * game.attack_distance, BONE, 1)
 	else:
 		draw_effect(&"sweep", age, p, dir.angle(), Vector2(64, 64))
 	if game.attack_result == "guard":
@@ -246,4 +388,32 @@ func draw_effect(id: StringName, age: float, p: Vector2, angle: float, pivot: Ve
 	var sideways := Vector2(-forward.y, forward.x)
 	draw_set_transform_matrix(Transform2D(forward * stretch.x, sideways * stretch.y, p.round()))
 	draw_texture(COMBAT_FX.get_frame_texture(id, frame), -pivot)
+	draw_set_transform(Vector2.ZERO)
+
+func field_enemies() -> void:
+	for e in game.enemies:
+		if e.hp <= 0 and e.dead > 0.5: continue
+		var p: Vector2 = e.p.round()
+		block(p.x - 15, p.y - 2, 30, 4, INK)
+		var frame := 1 if e.phase == "warn" else 2 if e.phase == "strike" else int(game.walk_clock * 7) % 2
+		var tint := Color(1.5, 1.0, 1.0) if e.hurt > 0 else Color.WHITE
+		if e.hp <= 0: tint = Color(0.45, 0.45, 0.5, 1.0 - float(e.dead) / 0.5)
+		draw_set_transform(p, 0, Vector2(-1 if e.dir.x < -0.3 else 1, 1))
+		draw_texture_rect_region(CREATURES[e.kind], Rect2(-32, -56, 64, 64), Rect2(frame * 64, 0, 64, 64), tint)
+		draw_set_transform(Vector2.ZERO)
+		if e.hp > 0:
+			if e.kind == "sentinel" and e.phase == "recover":
+				block(p.x - 5, p.y - 34, 10, 3, CYAN)
+			block(p.x - 12, p.y - 59, 24, 3, INK)
+			block(p.x - 12, p.y - 59, 24 * float(e.hp) / (12 if e.kind == "sentinel" else 8), 2, RED)
+
+func expedition_effect(id: StringName, age: float, p: Vector2) -> void:
+	if game.reduced_motion:
+		if age < 0.16: draw_rect(Rect2(p - Vector2(8, 15), Vector2(16, 12)), CYAN if id == &"organ_collect" else BONE, false, 1)
+		return
+	var frame := floori(age * EXP_FX.get_animation_speed(id))
+	if frame >= EXP_FX.get_frame_count(id): return
+	var pivot := Vector2(56, 94) if id == &"organ_collect" else Vector2(44, 64)
+	draw_set_transform(p.round(), 0, Vector2(0.5, 0.5))
+	draw_texture(EXP_FX.get_frame_texture(id, frame), -pivot)
 	draw_set_transform(Vector2.ZERO)

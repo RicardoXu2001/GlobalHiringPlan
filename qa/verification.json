@@ -2,55 +2,57 @@
   "schemaVersion": 2,
   "status": "PASS",
   "verify": {
-    "exitCode": 0,
     "command": "& ./rpg/验证.ps1",
+    "exitCode": 0,
     "suites": [
-      "Godot native viewport and injected keyboard/mouse events"
+      "Godot native viewport and injected keyboard/mouse events",
+      "Prologue combat, dodge, hurt and death regression",
+      "Four-room expedition, graft, shop, persisted stock and rearmed encounter"
     ]
   },
   "completeRun": {
-    "id": "native-rebuild",
+    "id": "native-prologue-and-expedition",
     "cleanContext": true,
-    "terminal": "b17-record-reached",
+    "terminal": "b17-and-grafted-rearmed-encounter-completed",
     "restart": "initial-state",
     "evidence": "qa/run.json"
   },
   "checks": {
     "launch": {
-      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ]
+      ],
+      "status": "PASS"
     },
     "render": {
-      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ]
+      ],
+      "status": "PASS"
     },
     "input": {
-      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ]
+      ],
+      "status": "PASS"
     },
     "coreLoop": {
-      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ]
+      ],
+      "status": "PASS"
     },
     "outcome": {
-      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ]
+      ],
+      "status": "PASS"
     },
     "restart": {
-      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ]
+      ],
+      "status": "PASS"
     }
   },
   "limitations": [
@@ -60,7 +62,7 @@
     },
     {
       "scope": "内容与平衡",
-      "reason": "当前为三场景切片。完整战役、最终 Boss、随机结构、真人节奏和趣味待验证。"
+      "reason": "已覆盖原序章、首组四关、一次中心接驳／购物与肺叶入口。其余六组、终极 Boss、长期经济、全部武器组合与真人手感待验证。"
     }
   ]
 }

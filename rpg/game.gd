@@ -28,6 +28,10 @@ var walk_clock := 0.0
 var dash_dir := Vector2.ZERO
 var dash_left := 0.0
 var dash_cooldown := 0.0
+var dash_age := -1.0
+var dash_trail: Array[Vector2] = []
+var evade_flash := 0.0
+var evade_point := Vector2.ZERO
 var attack_cooldown := 0.0
 var attack_windup := 0.0
 var attack_age := -1.0
@@ -36,9 +40,17 @@ var attack_origin := Vector2.ZERO
 var attack_direction := Vector2.ZERO
 var attack_distance := 108.0
 var hurt_flash := 0.0
+var hurt_age := -1.0
+var hurt_direction := Vector2.DOWN
+var death_age := 0.0
+var death_side := 1.0
+var impact_pause := 0.0
 var boss_hp := 24
+var boss_hurt_age := -1.0
+var boss_hurt_direction := Vector2.ZERO
 var boss_phase := "idle"
 var boss_time := 0.0
+var boss_fx_age := -1.0
 var hazard := Rect2()
 var strike_hit := false
 var hint_pos := Vector2.ZERO
@@ -47,6 +59,8 @@ var message_time := 0.0
 var transition_left := 0.0
 var text_scale := 1.0
 var reduced_motion := false
+var campaign := false
+var attack_contact := CORE - Vector2(0, 10)
 
 var world: Node2D
 var presentation: TextureRect
@@ -82,7 +96,10 @@ func _ready() -> void:
 		"return": tone(120, 410, 0.40), "open": tone(220, 410, 0.17),
 		"arc_miss": tone(155, 91, 0.13, 0.27), "arc_hit": tone(123, 45, 0.22, 0.43),
 		"probe_miss": tone(880, 254, 0.10, 0.08), "probe_hit": tone(760, 153, 0.15, 0.35),
-		"guard": tone(1120, 490, 0.115, 0.25), "break": tone(118, 34, 0.35, 0.48)
+		"guard": tone(1120, 490, 0.115, 0.25), "break": tone(118, 34, 0.35, 0.48),
+		"slam": tone(92, 29, 0.29, 0.48), "sweep": tone(240, 54, 0.24, 0.35),
+		"dash": tone(470, 130, 0.12, 0.28), "evade": tone(500, 940, 0.13, 0.10),
+		"hurt": tone(190, 58, 0.18, 0.40), "fall": tone(87, 33, 0.26, 0.33)
 	}
 	get_viewport().size_changed.connect(layout)
 	layout()
@@ -176,7 +193,6 @@ func reset_round(next_cycle: int) -> void:
 	hp = 5
 	boss_hp = 24
 	attack_cooldown = 0
-	dash_left = 0
 	dash_cooldown = 0
 	hurt_flash = 0
 	message = ""
@@ -194,6 +210,15 @@ func enter_room(next: String) -> void:
 	attack_windup = 0
 	attack_result = ""
 	dash_left = 0
+	dash_age = -1.0
+	dash_trail.clear()
+	evade_flash = 0.0
+	boss_fx_age = -1.0
+	hurt_flash = 0.0
+	hurt_age = -1.0
+	boss_hurt_age = -1.0
+	impact_pause = 0.0
+	death_age = 0.0
 	boss_phase = "idle"
 	boss_time = 1.2
 	play_sound("open")
@@ -268,13 +293,41 @@ func _physics_process(dt: float) -> void:
 			reset_round(2)
 	if screen == "play":
 		tick_play(dt)
+	elif screen == "dying":
+		var before := death_age
+		death_age += dt
+		hurt_flash = maxf(0, hurt_flash - dt)
+		if before < 0.32 and death_age >= 0.32:
+			play_sound("fall")
+		if death_age >= 1.1:
+			set_screen("failed")
 	world.queue_redraw()
 	ui.update_hud()
 
 func tick_play(dt: float) -> void:
+	if impact_pause > 0.0:
+		impact_pause = maxf(0, impact_pause - dt)
+		return
+	if hurt_age >= 0:
+		hurt_age += dt
+		if hurt_age >= 0.36:
+			hurt_age = -1.0
+	if boss_hurt_age >= 0:
+		boss_hurt_age += dt
+		if boss_hurt_age >= 0.36:
+			boss_hurt_age = -1.0
 	attack_cooldown = maxf(0, attack_cooldown - dt)
 	dash_cooldown = maxf(0, dash_cooldown - dt)
 	hurt_flash = maxf(0, hurt_flash - dt)
+	evade_flash = maxf(0, evade_flash - dt)
+	if boss_fx_age >= 0:
+		boss_fx_age += dt
+		if boss_fx_age >= 0.45:
+			boss_fx_age = -1.0
+	if dash_age >= 0:
+		dash_age += dt
+		if dash_age >= 0.26:
+			dash_age = -1.0
 	if attack_age >= 0.0:
 		attack_age += dt
 		if attack_age >= 0.32:
@@ -288,7 +341,12 @@ func tick_play(dt: float) -> void:
 		set_facing(direction)
 	if moving:
 		walk_clock += dt
+	var before_move := player
+	var evading := dash_left > 0
 	if dash_left > 0:
+		dash_trail.append(player.round())
+		if dash_trail.size() > 4:
+			dash_trail.pop_front()
 		move(dash_dir * 355.0 * dt)
 		dash_left = maxf(0, dash_left - dt)
 	else:
@@ -300,7 +358,7 @@ func tick_play(dt: float) -> void:
 			release_attack()
 	hint_pos = nearest_object()
 	if room == "press" and boss_hp > 0:
-		tick_boss(dt)
+		tick_boss(dt, evading, before_move)
 
 func move_direction() -> Vector2:
 	if not get_window().has_focus():
@@ -334,8 +392,10 @@ func dash() -> void:
 		dash_dir = facing
 	dash_left = 0.16
 	dash_cooldown = 0.7
+	dash_age = 0.0
+	dash_trail.clear()
 	set_facing(dash_dir)
-	play_sound("click")
+	play_sound("dash")
 
 func attack(direction: Vector2) -> void:
 	if build_id == "" or attack_cooldown > 0 or dash_left > 0 or direction == Vector2.ZERO:
@@ -346,6 +406,7 @@ func attack(direction: Vector2) -> void:
 	attack_direction = direction
 
 func release_attack() -> void:
+	attack_contact = CORE - Vector2(0, 10)
 	set_facing(attack_direction)
 	attack_age = 0.0
 	attack_origin = player.round() - Vector2(0, 10)
@@ -367,6 +428,9 @@ func release_attack() -> void:
 		notify(GUARD_NOTICE, 1.2)
 		return
 	attack_result = "hit"
+	boss_hurt_age = 0.0
+	boss_hurt_direction = attack_direction
+	impact_pause = 0.05 if build_id == "arc" else 0.03
 	boss_hp = maxi(0, boss_hp - (8 if build_id == "arc" else 4))
 	if boss_hp == 0:
 		boss_phase = "offline"
@@ -375,7 +439,7 @@ func release_attack() -> void:
 	else:
 		play_sound(build_id + "_hit")
 
-func tick_boss(dt: float) -> void:
+func tick_boss(dt: float, evading: bool, before_move: Vector2) -> void:
 	boss_time -= dt
 	if boss_time <= 0:
 		match boss_phase:
@@ -391,7 +455,8 @@ func tick_boss(dt: float) -> void:
 			"warn":
 				boss_phase = "strike"
 				boss_time = 0.19
-				play_sound("hit")
+				boss_fx_age = 0.0
+				play_sound("sweep" if hazard.size.x > 100 else "slam")
 			"strike":
 				boss_phase = "open"
 				boss_time = 1.07
@@ -400,14 +465,38 @@ func tick_boss(dt: float) -> void:
 			"open":
 				boss_phase = "idle"
 				boss_time = 0.68
-	if boss_phase == "strike" and not strike_hit and hazard.has_point(player) and dash_left <= 0:
+	var in_strike := hazard.has_point(player) or (evading and hazard.has_point(before_move))
+	if boss_phase == "strike" and not strike_hit and in_strike:
 		strike_hit = true
-		hp = maxi(0, hp - 2)
-		hurt_flash = 0.16
-		play_sound("hit")
-		if hp == 0:
-			play_sound("stop")
-			set_screen("failed")
+		if evading:
+			evade_flash = 0.35
+			evade_point = player.round()
+			play_sound("evade")
+			notify("擦身闪避", 0.65)
+			return
+		take_hit()
+
+func take_hit() -> void:
+	hp = maxi(0, hp - 2)
+	hurt_flash = 0.20
+	hurt_age = 0.0
+	hurt_direction = (player - CORE).normalized()
+	if hurt_direction == Vector2.ZERO:
+		hurt_direction = Vector2.DOWN
+	attack_windup = 0.0
+	attack_age = -1.0
+	play_sound("hurt")
+	notify("受击  −2 耐久", 0.85)
+	if hp == 0:
+		moving = false
+		dash_left = 0
+		dash_age = -1.0
+		death_side = -1.0 if player.x > 490 or (player.x >= 150 and player.x < CORE.x) else 1.0
+		death_age = 0.0
+		message = ""
+		set_screen("dying")
+	else:
+		impact_pause = 0.04
 
 func nearest_object() -> Vector2:
 	var options: Array[Vector2] = []
@@ -470,10 +559,11 @@ func context_text() -> String:
 	return "[ E ]  进入压力车间" if build_id != "" else "[ E ]  压力门  /  等待接入"
 
 func boss_text() -> String:
-	if room != "press" or boss_hp == 0:
+	if room != "press" or boss_hp == 0 or hp == 0:
 		return ""
 	var state := "护板闭合"
 	match boss_phase:
-		"warn", "strike": state = "▲  落点锁定"
+		"warn": state = "▲  横扫蓄力" if hazard.size.x > 100 else "▲  压降蓄力"
+		"strike": state = "▲  横扫释放" if hazard.size.x > 100 else "▲  压降落击"
 		"open": state = "◇  护板打开"
 	return "压力机  %02d / 24   %s" % [boss_hp, state]

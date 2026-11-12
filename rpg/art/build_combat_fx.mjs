@@ -16,7 +16,112 @@ const colors = {
   ink: hex('#07141F'), steel: hex('#244454'), slate: hex('#49616B'),
   mist: hex('#829499'), bone: hex('#DFE8D5'), brass: hex('#897451'),
   teal: hex('#237C83'), cyan: hex('#57E4CE'),
+  red: hex('#FF526D'),
 };
+
+// Ground-slam's contact / fractured floor / debris sequence informs these factory shapes.
+// PixelFX and its underlying Sprite Fusion techniques retain their MIT notices in combat/.
+function pressureStrike(horizontal) {
+  const rng = new Rng(horizontal ? 807 : 509);
+  const fragments = Array.from({ length: horizontal ? 16 : 12 }, () => ({
+    x: rng.range(horizontal ? -96 : -19, horizontal ? 96 : 19),
+    y: rng.range(horizontal ? -28 : -77, horizontal ? 28 : 77),
+    side: rng.sign(), speed: rng.range(8, 23), delay: rng.range(0.01, 0.10),
+  }));
+  return (p, t) => {
+    const fade = 1 - smooth(0.13, 0.42, t);
+    if (fade <= 0) return;
+    const width = horizontal ? 214 : 48, height = horizontal ? 75 : 166;
+    if (t < 0.12) {
+      const phase = clamp(t / 0.10);
+      const edge = horizontal ? -105 + phase * 207 : -81 + phase * 158;
+      if (horizontal) {
+        p.rect(edge - 2, -34, 4, 68, colors.bone);
+        p.rect(edge - 7, -31, 4, 62, colors.red);
+      } else {
+        p.rect(-22, edge - 2, 44, 4, colors.bone);
+        p.rect(-19, edge - 7, 38, 4, colors.red);
+      }
+    }
+    for (const f of fragments) {
+      const age = t - f.delay;
+      if (age < 0 || age > 0.30) continue;
+      const lift = Math.sin(Math.min(1, age / 0.30) * Math.PI) * f.speed;
+      const x = f.x + (horizontal ? age * f.side * 14 : lift * f.side * 0.35);
+      const y = f.y - lift * 0.5;
+      p.rect(x, y, 2, age < 0.1 ? 3 : 2, age < 0.08 ? colors.bone : colors.mist, fade * 0.8);
+      p.line(f.x, f.y, f.x + f.side * 5, f.y + 2, colors.steel, fade);
+    }
+    if (t > 0.06) {
+      const inset = smooth(0.06, 0.35, t) * 7;
+      p.line(-width/2 + 4, height/2 - 3 - inset, width/2 - 4, height/2 - 3 - inset,
+        t < 0.19 ? colors.red : colors.steel, fade * 0.5);
+    }
+  };
+}
+
+function dashWake(p, t) {
+  const fade = 1 - smooth(0.04, 0.23, t);
+  if (fade <= 0) return;
+  for (const [y, length] of [[-7, 31], [0, 47], [7, 24]]) {
+    const tail = -length + smooth(0.03, 0.22, t) * length;
+    p.poly([[tail,y],[-5,y-2],[0,y],[-5,y+1]], colors.teal, fade * 0.6);
+    p.line(tail+4, y, -6, y, colors.cyan, fade * 0.55);
+  }
+}
+
+function evadeRing(p, t) {
+  const fade = 1 - smooth(0.07, 0.30, t);
+  if (fade <= 0) return;
+  const radius = 8 + 16 * (1 - (1 - clamp(t / 0.30)) ** 3);
+  for (let segment = 0; segment < 6; segment++) {
+    const a = segment * Math.PI / 3;
+    p.line(Math.cos(a)*radius, Math.sin(a)*radius*0.55,
+      Math.cos(a+0.55)*radius, Math.sin(a+0.55)*radius*0.55,
+      t < 0.07 ? colors.bone : colors.cyan, fade);
+  }
+}
+
+function hurtBurst(machine) {
+  const rng = new Rng(machine ? 773 : 201);
+  const shards = Array.from({ length: machine ? 14 : 7 }, () => ({
+    a: rng.range(-Math.PI, Math.PI),
+    reach: rng.range(machine ? 13 : 10, machine ? 31 : 22),
+    life: rng.range(0.16, machine ? 0.31 : 0.26),
+  }));
+  return (p, t) => {
+    if (t < 0.067) {
+      const color = t < 0.034 ? colors.bone : machine ? colors.cyan : colors.red;
+      p.poly([[-11,2],[-4,-3],[-5,-10],[1,-4],[12,-5],[5,1],[9,8],[0,4],[-8,8]], color);
+      p.line(-6, 3, 7, -3, colors.bone);
+      p.glow(0, 0, 5, color, 0.12);
+    }
+    for (const shard of shards) {
+      const u = t / shard.life;
+      if (u >= 1) continue;
+      const r = 4 + shard.reach * (1 - (1-u) ** 3);
+      const x = Math.cos(shard.a), y = Math.sin(shard.a);
+      p.line(x*(r-5*(1-u)), y*(r-5*(1-u)), x*r, y*r,
+        machine ? colors.mist : colors.red, (1-u)*0.8);
+      if (machine) p.rect(x*r, y*r, 2, 2, colors.mist, 1-u);
+    }
+  };
+}
+
+function collapseDust(p, t) {
+  if (t >= 0.7) return;
+  const fade = 1 - smooth(0.22, 0.67, t);
+  const radius = 4 + 31 * (1 - (1-clamp(t/0.6))**3);
+  for (const side of [-1,1]) {
+    p.line(side*radius, 2, side*(radius-6), -2, colors.mist, fade*0.7);
+    p.rect(side*radius, -4-Math.sin(t*5)*3, 3, 2, colors.slate, fade*0.7);
+  }
+  for (let n=0; n<8; n++) {
+    const x = (n-3.5)*5;
+    const y = -3 - Math.sin(t*4+n)*3 - t*7;
+    p.rect(x, y, 2, 2, colors.mist, fade*0.5);
+  }
+}
 
 function sweep(p, t) {
   const front = -1.06 + 2.12 * clamp((t + 0.039) / 0.065);
@@ -120,6 +225,13 @@ const clips = [
   ['arc_hit', [64,64], [32,32], 0.30, contact('arc_hit')],
   ['probe_hit', [64,64], [32,32], 0.30, contact('probe_hit')],
   ['guard', [64,64], [32,32], 0.20, contact('guard')],
+  ['boss_slam', [80,192], [40,96], 0.45, pressureStrike(false)],
+  ['boss_sweep', [240,112], [120,56], 0.45, pressureStrike(true)],
+  ['dash', [80,48], [60,24], 0.26, dashWake],
+  ['evade', [64,48], [32,24], 0.34, evadeRing],
+  ['boss_hurt', [96,80], [48,40], 0.36, hurtBurst(true)],
+  ['player_hurt', [64,64], [32,32], 0.36, hurtBurst(false)],
+  ['collapse', [96,48], [48,24], 0.70, collapseDust],
   ['cutter', [24,24], [12,12], 0, cutter],
   ['rangefinder', [24,24], [12,12], 0, rangefinder],
 ];

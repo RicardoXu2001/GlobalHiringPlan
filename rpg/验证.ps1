@@ -19,24 +19,45 @@ try {
     $quotedProject = '"' + $PSScriptRoot + '"'
     $import = Start-Process -FilePath $Godot -ArgumentList '--headless','--editor','--path',$quotedProject,'--import' -WindowStyle Hidden -Wait -PassThru
     if ($import.ExitCode -ne 0) { throw 'Godot import failed.' }
-    $log = Join-Path $runDir 'godot.log'
-    $quotedLog = '"' + $log + '"'
-    $game = Start-Process -FilePath $Godot -ArgumentList '--path',$quotedProject,'--resolution','1280x720','--script','res://tests/playthrough.gd','--log-file',$quotedLog -WindowStyle Hidden -PassThru
-    if (!$game.WaitForExit(65000)) {
-        Stop-Process -Id $game.Id
-        throw 'Godot playthrough exceeded its time limit.'
-    }
-    $code = $game.ExitCode
-    if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log }
-    $tracePath = Join-Path $runDir 'trace.json'
-    if (Test-Path -LiteralPath $tracePath) {
-        $trace = Get-Content -LiteralPath $tracePath -Raw -Encoding utf8 | ConvertFrom-Json
-        foreach ($frame in $trace.frames) {
-            Copy-Item -LiteralPath (Join-Path $runDir $frame) -Destination (Join-Path $output $frame) -Force
+    $suiteTraces = @()
+    foreach ($suite in @('playthrough', 'expedition_playthrough')) {
+        $suiteDir = Join-Path $runDir $suite
+        New-Item -ItemType Directory -Path $suiteDir -Force | Out-Null
+        $env:APPDATA = $suiteDir
+        $env:BOSS_QA_OUTPUT = $suiteDir
+        $log = Join-Path $suiteDir 'godot.log'
+        $quotedLog = '"' + $log + '"'
+        $game = Start-Process -FilePath $Godot -ArgumentList '--path',$quotedProject,'--resolution','1280x720','--script',("res://tests/$suite.gd"),'--log-file',$quotedLog -WindowStyle Hidden -PassThru
+        if (!$game.WaitForExit(55000)) {
+            Stop-Process -Id $game.Id
+            throw "Godot $suite exceeded its time limit."
         }
-    } else {
-        $code = 1
-        $reason = 'No playthrough trace was written.'
+        $code = $game.ExitCode
+        if (Test-Path -LiteralPath $log) {
+            $logText = Get-Content -LiteralPath $log -Raw
+            Write-Output $logText
+            if ($logText -match '(SCRIPT ERROR:|ERROR:)') { throw "Godot $suite logged an error." }
+        }
+        $tracePath = Join-Path $suiteDir 'trace.json'
+        if (!(Test-Path -LiteralPath $tracePath)) { throw "No $suite trace was written." }
+        $suiteTrace = Get-Content -LiteralPath $tracePath -Raw -Encoding utf8 | ConvertFrom-Json
+        $suiteTraces += $suiteTrace
+        foreach ($frame in $suiteTrace.frames) {
+            Copy-Item -LiteralPath (Join-Path $suiteDir $frame) -Destination (Join-Path $output $frame) -Force
+        }
+        if ($code -ne 0) { throw "Godot $suite failed." }
+    }
+    $mergedChecks = [ordered]@{}
+    foreach ($key in $keys) {
+        $mergedChecks[$key] = if (@($suiteTraces | Where-Object { $_.checks.$key -ne 'PASS' }).Count -eq 0) { 'PASS' } else { 'FAIL' }
+    }
+    $trace = [pscustomobject]@{
+        checks = [pscustomobject]$mergedChecks
+        checkpoints = @($suiteTraces | ForEach-Object { $_.checkpoints })
+        frames = @($suiteTraces | ForEach-Object { $_.frames })
+        engine = $suiteTraces[-1].engine
+        renderer = $suiteTraces[-1].renderer
+        viewport = $suiteTraces[-1].viewport
     }
 } catch {
     $code = 1
@@ -61,9 +82,9 @@ if ($code -ne 0) {
     $checks[$firstOpen].status = 'FAIL'
 }
 $completeRun = [ordered]@{
-    id='native-rebuild'
+    id='native-prologue-and-expedition'
     cleanContext=$true
-    terminal=($(if ($facts.outcome -eq 'PASS') { 'b17-record-reached' } else { 'NOT_REACHED' }))
+    terminal=($(if ($facts.outcome -eq 'PASS') { 'b17-and-grafted-rearmed-encounter-completed' } else { 'NOT_REACHED' }))
     restart=($(if ($facts.restart -eq 'PASS') { 'initial-state' } else { 'NOT_RUN' }))
     evidence='qa/run.json'
 }
@@ -84,12 +105,12 @@ Write-Record 'run.json' ([ordered]@{
 Write-Record 'verification.json' ([ordered]@{
     schemaVersion=2
     status=($(if ($code -ne 0) {'FAIL'} elseif ($facts.Values -contains 'NOT_RUN') {'NOT_RUN'} else {'PASS'}))
-    verify=@{command=$command; exitCode=$code; suites=@('Godot native viewport and injected keyboard/mouse events')}
+    verify=@{command=$command; exitCode=$code; suites=@('Godot native viewport and injected keyboard/mouse events', 'Prologue combat, dodge, hurt and death regression', 'Four-room expedition, graft, shop, persisted stock and rearmed encounter')}
     completeRun=$completeRun
     checks=$checks
     limitations=@(
         @{scope='输入与画面';reason='Windows Godot 窗口用引擎输入事件完成路径。未测真人输入设备、全屏、不同 DPI 或干净机器。'},
-        @{scope='内容与平衡';reason='当前为三场景切片。完整战役、最终 Boss、随机结构、真人节奏和趣味待验证。'}
+        @{scope='内容与平衡';reason='已覆盖原序章、首组四关、一次中心接驳／购物与肺叶入口。其余六组、终极 Boss、长期经济、全部武器组合与真人手感待验证。'}
     )
 })
 exit $code
