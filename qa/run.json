@@ -1,14 +1,6 @@
 {
   "qa": {
     "command": "& ./rpg/验证.ps1",
-    "exitCode": 0,
-    "completeRun": {
-      "id": "native-prologue-and-expedition",
-      "cleanContext": true,
-      "terminal": "b17-and-grafted-rearmed-encounter-completed",
-      "restart": "initial-state",
-      "evidence": "qa/run.json"
-    },
     "checks": {
       "launch": "PASS",
       "render": "PASS",
@@ -16,6 +8,14 @@
       "coreLoop": "PASS",
       "outcome": "PASS",
       "restart": "PASS"
+    },
+    "exitCode": 0,
+    "completeRun": {
+      "id": "native-prologue-and-expedition",
+      "cleanContext": true,
+      "terminal": "b17-and-grafted-rearmed-encounter-completed",
+      "restart": "initial-state",
+      "evidence": "qa/run.json"
     }
   },
   "runtime": "4.5.1-stable (official)",
@@ -333,9 +333,9 @@
       "screen": "shop",
       "stage": 0,
       "stock": [
-        "nailer",
         "arc",
-        "capacitor"
+        "nailer",
+        "plating"
       ],
       "tier": 1
     },
@@ -359,9 +359,9 @@
       "screen": "exp_complete",
       "stage": 0,
       "stock": [
-        "nailer",
         "arc",
-        "capacitor"
+        "nailer",
+        "plating"
       ],
       "tier": 1
     },

@@ -2,7 +2,7 @@ extends Control
 
 const INK = Color("#07141f")
 const NIGHT = Color("#102738")
-const STEEL = Color("#244454")
+const STEEL = Color("#49616b")
 const MIST = Color("#829499")
 const BONE = Color("#dfe8d5")
 const CYAN = Color("#57e4ce")
@@ -31,6 +31,9 @@ func surface(color: Color, stroke: Color, border_width: int = 1) -> StyleBoxFlat
 	style.bg_color = color
 	style.border_color = stroke
 	style.set_border_width_all(border_width)
+	style.shadow_color = Color(INK, 0.75)
+	style.shadow_size = 4
+	style.shadow_offset = Vector2(0, 3)
 	style.content_margin_left = 16
 	style.content_margin_right = 16
 	return style
@@ -45,6 +48,11 @@ func plate(rect: Rect2, bg: Color = INK, stroke: Color = STEEL) -> Panel:
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_theme_stylebox_override("panel", surface(bg, stroke))
 	place(panel, rect)
+	if rect.size.x < 1279 and bg.a > 0.8:
+		var bevel := ColorRect.new()
+		bevel.color = Color(MIST, 0.30)
+		bevel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		place(bevel, Rect2(rect.position + Vector2(2, 2), Vector2(rect.size.x - 4, 1)))
 	return panel
 
 func words(copy: String, rect: Rect2, px: int, color: Color = BONE) -> Label:
@@ -94,8 +102,8 @@ func refresh() -> void:
 			popup("接入模块", "系统  /  01", "压力门已接入。选一件工具，带进去。")
 			plate(Rect2(252, 314, 372, 102), NIGHT)
 			plate(Rect2(656, 314, 372, 102), NIGHT)
-			weapon_card(preload("res://art/combat/cutter.png"), "棘齿切割器", "近身宽斩 · 8 伤害", 252)
-			weapon_card(preload("res://art/combat/rangefinder.png"), "脉冲测距枪", "远距窄束 · 4 伤害", 656)
+			weapon_card(preload("res://art/painted/arc.tres"), "短弧电切刃", "近身宽斩 · 8 伤害", 252)
+			weapon_card(preload("res://art/painted/probe.tres"), "探针长枪", "远距窄束 · 4 伤害", 656)
 			button("1   装配短弧", Rect2(252, 431, 372, 56), game.equip.bind("arc"), true).grab_focus()
 			button("2   装配探针", Rect2(656, 431, 372, 56), game.equip.bind("probe"))
 		"log":
@@ -139,10 +147,12 @@ func weapon_card(texture: Texture2D, name_text: String, details: String, x: int)
 	var icon := TextureRect.new()
 	icon.texture = texture
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	place(icon, Rect2(x + 12, 330, 72, 72))
-	words(name_text, Rect2(x + 94, 324, 260, 44), 21)
-	words(details, Rect2(x + 94, 369, 260, 41), 17, MIST)
+	place(icon, Rect2(x + 12, 324, 144, 80))
+	words(name_text, Rect2(x + 170, 324, 190, 44), 21)
+	words(details, Rect2(x + 170, 369, 190, 41), 17, MIST)
 
 func title() -> void:
 	plate(Rect2(0, 0, 550, 720))
@@ -156,7 +166,7 @@ func title() -> void:
 	if started:
 		button("重开序章", Rect2(360, 463, 150, 60), game.ask_new)
 	button("继续首组远征" if not game.saved_run.is_empty() else "开始首组远征", Rect2(60, 541, 350, 58), game.continue_expedition)
-	words("生体工厂试玩  /  0.2", Rect2(60, 640, 470, 40), 16, MIST)
+	words("生体工厂试玩  /  0.2.1 · ART-2", Rect2(60, 640, 470, 40), 16, MIST)
 
 func hud() -> void:
 	plate(Rect2(22, 20, 550, 85))
@@ -227,10 +237,12 @@ func shop_panel() -> void:
 			plate(Rect2(x, 259, 287, 206), NIGHT)
 			words(game.item_name(id), Rect2(x + 14, 270, 259, 35), 22)
 			var icon := TextureRect.new()
-			icon.texture = load("res://art/expedition/%s-%s.png" % ["weapon" if id in game.WEAPONS else "gear", id])
+			icon.texture = load("res://art/painted/%s.tres" % id)
 			icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			place(icon, Rect2(x + 17, 305, 128, 64))
+			place(icon, Rect2(x + 14, 305, 259, 65))
 			words(game.item_detail(id), Rect2(x + 14, 375, 259, 72), 17, MIST)
 			var equipped: bool = id == game.build_id or id == game.gear
 			var buy_button := button("已售出" if i in game.sold else "当前装备" if equipped else "替换装备 · 12 工料", Rect2(x, 472, 287, 48), game.buy.bind(i))

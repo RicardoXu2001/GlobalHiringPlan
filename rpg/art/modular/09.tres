@@ -1,0 +1,153 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/modular/09-walk.png" id="walk"]
+
+[ext_resource type="Texture2D" path="res://art/modular/09-actions.png" id="actions"]
+
+[sub_resource type="AtlasTexture" id="walk_front_0"]
+atlas = ExtResource("walk")
+region = Rect2(29,31,201,425)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_front_1"]
+atlas = ExtResource("walk")
+region = Rect2(314,34,167,422)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_front_2"]
+atlas = ExtResource("walk")
+region = Rect2(568,27,172,428)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_front_3"]
+atlas = ExtResource("walk")
+region = Rect2(830,34,166,423)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_front_4"]
+atlas = ExtResource("walk")
+region = Rect2(1083,38,168,419)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_front_5"]
+atlas = ExtResource("walk")
+region = Rect2(1344,29,163,424)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_back_0"]
+atlas = ExtResource("walk")
+region = Rect2(24,539,200,425)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_back_1"]
+atlas = ExtResource("walk")
+region = Rect2(311,545,169,416)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_back_2"]
+atlas = ExtResource("walk")
+region = Rect2(562,537,175,427)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_back_3"]
+atlas = ExtResource("walk")
+region = Rect2(801,544,197,420)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_back_4"]
+atlas = ExtResource("walk")
+region = Rect2(1082,548,168,416)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_back_5"]
+atlas = ExtResource("walk")
+region = Rect2(1341,540,165,420)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_0"]
+atlas = ExtResource("actions")
+region = Rect2(51,43,194,262)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_1"]
+atlas = ExtResource("actions")
+region = Rect2(348,40,210,265)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_2"]
+atlas = ExtResource("actions")
+region = Rect2(640,36,273,269)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="arc_3"]
+atlas = ExtResource("actions")
+region = Rect2(991,23,168,282)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="ranged_0"]
+atlas = ExtResource("actions")
+region = Rect2(87,331,140,290)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="ranged_1"]
+atlas = ExtResource("actions")
+region = Rect2(374,333,175,286)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="ranged_2"]
+atlas = ExtResource("actions")
+region = Rect2(682,347,187,272)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="ranged_3"]
+atlas = ExtResource("actions")
+region = Rect2(995,333,161,288)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="dash_0"]
+atlas = ExtResource("actions")
+region = Rect2(57,707,197,212)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="dash_1"]
+atlas = ExtResource("actions")
+region = Rect2(325,701,256,218)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="dash_2"]
+atlas = ExtResource("actions")
+region = Rect2(657,711,223,206)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="dash_3"]
+atlas = ExtResource("actions")
+region = Rect2(989,644,170,276)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="death_0"]
+atlas = ExtResource("actions")
+region = Rect2(57,959,223,262)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="death_1"]
+atlas = ExtResource("actions")
+region = Rect2(330,1012,294,209)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="death_2"]
+atlas = ExtResource("actions")
+region = Rect2(624,1053,252,160)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="death_3"]
+atlas = ExtResource("actions")
+region = Rect2(936,1114,273,99)
+filter_clip = true
+
+[resource]
+animations = [{"frames":[{"duration":1.0,"texture":SubResource("walk_front_0")},{"duration":1.0,"texture":SubResource("walk_front_1")},{"duration":1.0,"texture":SubResource("walk_front_2")},{"duration":1.0,"texture":SubResource("walk_front_3")},{"duration":1.0,"texture":SubResource("walk_front_4")},{"duration":1.0,"texture":SubResource("walk_front_5")}],"loop":true,"name":&"walk-front","speed":12.0},
+{"frames":[{"duration":1.0,"texture":SubResource("walk_back_0")},{"duration":1.0,"texture":SubResource("walk_back_1")},{"duration":1.0,"texture":SubResource("walk_back_2")},{"duration":1.0,"texture":SubResource("walk_back_3")},{"duration":1.0,"texture":SubResource("walk_back_4")},{"duration":1.0,"texture":SubResource("walk_back_5")}],"loop":true,"name":&"walk-back","speed":12.0},
+{"frames":[{"duration":1.0,"texture":SubResource("arc_0")},{"duration":1.0,"texture":SubResource("arc_1")},{"duration":1.0,"texture":SubResource("arc_2")},{"duration":1.0,"texture":SubResource("arc_3")}],"loop":false,"name":&"arc","speed":12.0},
+{"frames":[{"duration":1.0,"texture":SubResource("ranged_0")},{"duration":1.0,"texture":SubResource("ranged_1")},{"duration":1.0,"texture":SubResource("ranged_2")},{"duration":1.0,"texture":SubResource("ranged_3")}],"loop":false,"name":&"ranged","speed":12.0},
+{"frames":[{"duration":1.0,"texture":SubResource("dash_0")},{"duration":1.0,"texture":SubResource("dash_1")},{"duration":1.0,"texture":SubResource("dash_2")},{"duration":1.0,"texture":SubResource("dash_3")}],"loop":false,"name":&"dash","speed":12.0},
+{"frames":[{"duration":1.0,"texture":SubResource("death_0")},{"duration":1.0,"texture":SubResource("death_1")},{"duration":1.0,"texture":SubResource("death_2")},{"duration":1.0,"texture":SubResource("death_3")}],"loop":false,"name":&"death","speed":12.0}]

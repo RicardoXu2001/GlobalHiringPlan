@@ -71,12 +71,13 @@ var tones: Dictionary
 func _ready() -> void:
 	get_window().min_size = Vector2i(960, 540)
 	var pixel_view := SubViewport.new()
-	pixel_view.size = Vector2i(640, 360)
+	pixel_view.size = Vector2i(1280, 720)
 	pixel_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	pixel_view.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
 	add_child(pixel_view)
 	world = World.new()
 	world.game = self
+	world.scale = Vector2(2, 2)
 	pixel_view.add_child(world)
 	presentation = TextureRect.new()
 	presentation.texture = pixel_view.get_texture()
@@ -108,13 +109,13 @@ func _ready() -> void:
 
 func layout() -> void:
 	var available := get_viewport().get_visible_rect().size
-	var pixel_scale := maxf(1.0, floorf(minf(available.x / 640, available.y / 360)))
-	presentation.size = Vector2(640, 360) * pixel_scale
+	var fit := minf(available.x / 1280, available.y / 720)
+	var pixel_scale := floorf(fit) if fit >= 1.0 else fit
+	presentation.size = Vector2(1280, 720) * pixel_scale
 	presentation.position = ((available - presentation.size) / 2).floor()
-	var text_zoom := minf(available.x / 1280, available.y / 720)
 	ui.size = Vector2(1280, 720)
-	ui.scale = Vector2.ONE * text_zoom
-	ui.position = ((available - ui.size * text_zoom) / 2).floor()
+	ui.scale = Vector2.ONE * pixel_scale
+	ui.position = presentation.position
 
 func tone(start_hz: float, end_hz: float, length: float, grit := 0.0) -> AudioStreamWAV:
 	var sound := AudioStreamWAV.new()
@@ -406,7 +407,7 @@ func attack(direction: Vector2) -> void:
 	attack_direction = direction
 
 func release_attack() -> void:
-	attack_contact = CORE - Vector2(0, 10)
+	attack_contact = CORE - Vector2(0, 38)
 	set_facing(attack_direction)
 	attack_age = 0.0
 	attack_origin = player.round() - Vector2(0, 10)
@@ -419,7 +420,7 @@ func release_attack() -> void:
 		play_sound(build_id + "_miss")
 		return
 	if build_id == "probe":
-		var contact := CORE - Vector2(0, 10) - attack_origin
+		var contact := attack_contact - attack_origin
 		attack_direction = contact.normalized()
 		attack_distance = contact.length()
 	if boss_phase != "open":

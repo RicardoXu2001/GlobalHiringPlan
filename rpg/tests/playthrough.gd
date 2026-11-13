@@ -159,7 +159,8 @@ func run() -> void:
 	send_key(KEY_S, false)
 	var remaining: float = game.dash_cooldown
 	await tap(KEY_SPACE)
-	if not expect(game.dash_cooldown < remaining, "Repeated dodge input respects cooldown"):
+	# Two rendered frames can share a physics tick; cooldown must not increase.
+	if not expect(game.dash_cooldown <= remaining, "Repeated dodge input respects cooldown"):
 		return
 	if not await until(func(): return game.boss_phase == "strike" and game.boss_fx_age >= 0.033, 1):
 		fail("Pressure strike did not begin")

@@ -282,7 +282,7 @@ func release_attack() -> void:
 	attack_result = "miss"
 	var damage: int = int(WEAPONS[build_id].damage) + tier * 2 + (1 if integrated else 0)
 	if room == "press" and boss_hp > 0 and can_hit(CORE):
-		attack_contact = CORE - Vector2(0, 10)
+		attack_contact = CORE - Vector2(0, 38)
 		if boss_phase != "open":
 			attack_result = "guard"
 			play_sound("guard")
@@ -292,6 +292,8 @@ func release_attack() -> void:
 		boss_hurt_age = 0.0
 		boss_hurt_direction = attack_direction
 		attack_result = "hit"
+		if build_id != "arc":
+			attack_direction = (attack_contact - attack_origin).normalized()
 		if boss_hp == 0:
 			boss_phase = "offline"
 			clear_stage()

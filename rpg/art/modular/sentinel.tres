@@ -1,0 +1,66 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/modular/sentinel-motion.png" id="1"]
+
+[sub_resource type="AtlasTexture" id="frame_0"]
+atlas = ExtResource("1")
+region = Rect2(36,13,296,310)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_1"]
+atlas = ExtResource("1")
+region = Rect2(409,18,277,298)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_2"]
+atlas = ExtResource("1")
+region = Rect2(774,22,274,294)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_3"]
+atlas = ExtResource("1")
+region = Rect2(1156,19,256,297)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_4"]
+atlas = ExtResource("1")
+region = Rect2(14,366,339,304)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_5"]
+atlas = ExtResource("1")
+region = Rect2(396,402,287,268)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_6"]
+atlas = ExtResource("1")
+region = Rect2(734,411,321,259)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_7"]
+atlas = ExtResource("1")
+region = Rect2(1091,363,348,306)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_8"]
+atlas = ExtResource("1")
+region = Rect2(20,733,331,303)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_9"]
+atlas = ExtResource("1")
+region = Rect2(381,742,302,291)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_10"]
+atlas = ExtResource("1")
+region = Rect2(725,787,336,250)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="frame_11"]
+atlas = ExtResource("1")
+region = Rect2(1089,864,344,181)
+filter_clip = true
+
+[resource]
+animations = [{"frames":[{"duration":1.0,"texture":SubResource("frame_0")},{"duration":1.0,"texture":SubResource("frame_1")},{"duration":1.0,"texture":SubResource("frame_2")},{"duration":1.0,"texture":SubResource("frame_3")},{"duration":1.0,"texture":SubResource("frame_4")},{"duration":1.0,"texture":SubResource("frame_5")},{"duration":1.0,"texture":SubResource("frame_6")},{"duration":1.0,"texture":SubResource("frame_7")},{"duration":1.0,"texture":SubResource("frame_8")},{"duration":1.0,"texture":SubResource("frame_9")},{"duration":1.0,"texture":SubResource("frame_10")},{"duration":1.0,"texture":SubResource("frame_11")}],"loop":false,"name":&"body","speed":12.0}]

@@ -1,0 +1,164 @@
+{
+  "hero-down-right": {
+    "source": "hero.png",
+    "region": [
+      230,
+      40,
+      236,
+      541
+    ]
+  },
+  "hero-down-left": {
+    "source": "hero.png",
+    "region": [
+      782,
+      39,
+      248,
+      542
+    ]
+  },
+  "hero-up-right": {
+    "source": "hero.png",
+    "region": [
+      238,
+      647,
+      226,
+      554
+    ]
+  },
+  "hero-up-left": {
+    "source": "hero.png",
+    "region": [
+      784,
+      647,
+      233,
+      554
+    ]
+  },
+  "door-closed": {
+    "source": "door.png",
+    "region": [
+      110,
+      53,
+      682,
+      792
+    ]
+  },
+  "door-open": {
+    "source": "door.png",
+    "region": [
+      969,
+      53,
+      684,
+      792
+    ]
+  },
+  "arc": {
+    "source": "arc.png",
+    "region": [
+      39,
+      69,
+      2092,
+      588
+    ]
+  },
+  "probe": {
+    "source": "probe.png",
+    "region": [
+      82,
+      198,
+      2009,
+      351
+    ]
+  },
+  "nailer": {
+    "source": "nailer.png",
+    "region": [
+      176,
+      92,
+      1407,
+      735
+    ]
+  },
+  "husk": {
+    "source": "husk.png",
+    "region": [
+      73,
+      118,
+      1388,
+      777
+    ]
+  },
+  "infected": {
+    "source": "infected.png",
+    "region": [
+      210,
+      65,
+      943,
+      1138
+    ]
+  },
+  "sentinel": {
+    "source": "sentinel.png",
+    "region": [
+      80,
+      30,
+      1143,
+      1097
+    ]
+  },
+  "boss": {
+    "source": "boss.png",
+    "region": [
+      19,
+      37,
+      1364,
+      1055
+    ]
+  },
+  "graft-empty": {
+    "source": "graft-empty.png",
+    "region": [
+      120,
+      71,
+      1110,
+      1034
+    ]
+  },
+  "graft-full": {
+    "source": "graft-full.png",
+    "region": [
+      120,
+      75,
+      1105,
+      1026
+    ]
+  },
+  "terminal": {
+    "source": "terminal.png",
+    "region": [
+      382,
+      150,
+      550,
+      877
+    ]
+  },
+  "plating": {
+    "source": "plating.png",
+    "region": [
+      204,
+      140,
+      928,
+      916
+    ]
+  },
+  "capacitor": {
+    "source": "capacitor.png",
+    "region": [
+      207,
+      189,
+      607,
+      1139
+    ]
+  }
+}

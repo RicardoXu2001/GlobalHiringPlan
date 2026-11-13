@@ -1,8 +1,8 @@
 # 夜班回路（开发代号，正式名称待定）
 
-旧标题已停用，主角称为 09。当前为 **0.2 首组整备原型**，保留原序章，并开放首组四关、中心合并／购物和肺叶入口遭遇。完整七组与古神降临的 29 关计划仍待后续制作。
+旧标题已停用，主角称为 09。当前为 **0.2.1 · 模块与动作修正版**，保留原序章，并开放首组四关、中心合并／购物和肺叶入口遭遇。完整七组与古神降临的 29 关计划仍待后续制作。
 
-《夜班回路》0.1 是 RPG 的首个可玩切片。Windows 本机可双击[试玩启动器](../试玩重构版.cmd)，它会查找仓库上两级目录的 Godot 4.5.1。也可用 Godot 4.5.1 导入本目录的 [project.godot](project.godot)，等待图片导入完成后按 F5。
+Windows 本机可双击[试玩启动器](../试玩重构版.cmd)，它会查找仓库上两级目录的 Godot 4.5.1。也可用 Godot 4.5.1 导入本目录的 [project.godot](project.godot)，等待图片导入完成后按 F5。
 
 0.2 在标题选择「开始首组远征」，选择基础武器后从中心右侧出发。三个小怪关依次检验扑击、感染工人攻击和免疫守卫的正面护甲；清理敌人后靠近右上出口按 E。第四关守卫核心开放时可伤，击败后取得心核并回中心。中央 E 接入心核，左侧 E 打开武器铺，右侧 E 再出发；完成肺叶入口后显示本版终点。
 
@@ -10,7 +10,11 @@
 
 首组三个小怪关各奖励 6 工料，Boss 奖励 12，共 30。每件商品 12、首次强化 10、每批最多刷新一次且花 6。第一批保证压力铆枪用于验证新武器，其他货品从有限池抽取；库存、售出状态与刷新次数随远征保存。战败终止本轮；暂停中的「重新远征」也会清空本轮构筑。未完成关卡的退出继续会回到入场状态。
 
-新增素材可用 `python rpg/art/build_expedition.py` 重建；新增特效可用 `node rpg/art/build_expedition_fx.mjs` 从本地 PixelFX 烘焙，沿用 [MIT 声明](art/combat/PIXELFX_LICENSE) 与 [署名](art/combat/PIXELFX_NOTICE.md)。
+当前世界由 `world.gd` 的独立地板、墙、柱、门、管线和机械部件组合，不加载整房间背景。`rpg/art/modular/` 存放 64 个角色／敌人姿态帧与 12 个模块的图集及元数据；执行 `python rpg/art/index_modular.py` 可重建 SpriteFrames、区域、脚点和握持点，不修改 PNG。[制作提示词](art/modular/PROMPTS.md)。09 用六帧前／后行走及四帧动作片段，三类小怪各 12 个姿态；动作跟随原有规则时钟。Boss 用独立护板、锤臂、活塞与心核部件，世界按脚点排序。场景仍为 1280×720 渲染、640×360 玩法坐标。
+
+原 `painted/` 的人物定妆与房间图保留作造型／材质参考，武器和装备图仍用于持物或 UI。旧绘图脚本只保留为历史来源。当前仍需精修全方向动作、握持点和帧间一致性。[动态实机](../qa/modular-motion.gif)。
+
+新增特效可用 `node rpg/art/build_expedition_fx.mjs` 从本地 PixelFX 烘焙，沿用 [MIT 声明](art/combat/PIXELFX_LICENSE) 与 [署名](art/combat/PIXELFX_NOTICE.md)。
 
 | 操作 | 键位 |
 | --- | --- |
@@ -27,11 +31,11 @@
 
 有效命中会短暂停顿，Boss 的机体反冲、金属碎屑和装甲裂纹表现损伤。主角受伤会取消尚未出手的攻击，并出现局部白红闪光与踉跄。耐久耗尽后约 1.1 秒内依次击倒、落地、脱手与暗化，再出现重试按钮。低动效采用短标记和两档倒地姿态。
 
-短弧「棘齿切割器」用骨白宽刃近身劈开弱点。探针「脉冲测距枪」用青色窄束命中远处开板口。撞上护板会弹开灰白火花并发出短促金属声。红框出现后离开落点，看到青色护板抬起再打。停机后靠近右侧日志终端。
+短弧电切刃用骨白亮芯近身劈开弱点。探针长枪用窄束命中远处开板口。撞上护板会弹开灰白火花并发出短促金属声。红框出现后离开落点，看到青色核心提示再打。停机后靠近右侧日志终端。
 
 主动确认回溯时写入 B-17 检查点，进入旁路读完供给记录后再次保存。标题的「继续调查」从最新检查点继续。战败重试重开当前轮，「重新调查」清除切片进度。存档使用 Godot 的 `user://night-shift.cfg`，应用数据目录为 `BossCompanyRebuild`。
 
-暂停页提供 100%、125%、150% 文字大小及低动效开关。场景图和精灵使用 ART-1.0 色板，运行直接读取已存的 PNG。需要改图时可用 Python 和 Pillow 执行 `python rpg/art/draw_pixels.py`。
+暂停页提供 100%、125%、150% 文字大小及低动效开关。场景图和精灵遵循 [ART-2](../design/ART_DIRECTION.md) 的材质色系与功能色，运行直接读取已存 PNG。1280×720 为原生显示，2560×1440 为整数 2 倍；1920×1080 场景居中留边。小于 1280×720 会缩小，文字与细节仍待专项检查。
 
 ## 像素特效制作
 
@@ -44,6 +48,6 @@ $opts = '{"palette":["#07141F","#102738","#244454","#237C83","#57E4CE","#829499"
 node .runtime/pixelfx-tools/tools/render.mjs impacts/bullet-impact --sheet --no-actor --opts $opts --out .runtime/pixelfx-preview
 ```
 
-样例生成透明 PNG、帧数据 JSON 和预览图。进入 Godot 的特效使用最近邻采样，按 JSON 的帧矩形、时长与锚点配置。审查以游戏内像素尺寸为准，保留红色预警的形状与对比度，遵循 [ART-1.0](../design/ART_DIRECTION.md)。分发采用的资产时保留 [LICENSE](https://github.com/patch-gg/pixelfx/blob/044e12a45dc9cc312cec50ee606dfc98afe5adc2/LICENSE) 和[上游署名](https://github.com/patch-gg/pixelfx/blob/044e12a45dc9cc312cec50ee606dfc98afe5adc2/NOTICE.md)。
+样例生成透明 PNG、帧数据 JSON 和预览图。进入 Godot 的特效使用最近邻采样，按 JSON 的帧矩形、时长与锚点配置。审查以游戏内像素尺寸为准，保留红色预警的形状与对比度，遵循 [ART-2](../design/ART_DIRECTION.md)。分发采用的资产时保留 [LICENSE](https://github.com/patch-gg/pixelfx/blob/044e12a45dc9cc312cec50ee606dfc98afe5adc2/LICENSE) 和[上游署名](https://github.com/patch-gg/pixelfx/blob/044e12a45dc9cc312cec50ee606dfc98afe5adc2/NOTICE.md)。
 
 在仓库根目录运行 `& ./rpg/验证.ps1` 可复现 Godot 实机渲染与注入输入路径。[游戏策划案](../design/GAME_DESIGN.md) · [构建说明](../design/BUILD_BRIEF.md) · [QA 报告](../qa/QA_REPORT.md)

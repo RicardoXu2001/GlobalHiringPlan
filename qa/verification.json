@@ -19,50 +19,50 @@
   },
   "checks": {
     "launch": {
+      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ],
-      "status": "PASS"
+      ]
     },
     "render": {
+      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ],
-      "status": "PASS"
+      ]
     },
     "input": {
+      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ],
-      "status": "PASS"
+      ]
     },
     "coreLoop": {
+      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ],
-      "status": "PASS"
+      ]
     },
     "outcome": {
+      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ],
-      "status": "PASS"
+      ]
     },
     "restart": {
+      "status": "PASS",
       "evidence": [
         "qa/run.json"
-      ],
-      "status": "PASS"
+      ]
     }
   },
   "limitations": [
     {
-      "scope": "输入与画面",
-      "reason": "Windows Godot 窗口用引擎输入事件完成路径。未测真人输入设备、全屏、不同 DPI 或干净机器。"
+      "reason": "Windows Godot 窗口用引擎输入事件完成路径。未测真人输入设备、全屏、不同 DPI 或干净机器。",
+      "scope": "输入与画面"
     },
     {
-      "scope": "内容与平衡",
-      "reason": "已覆盖原序章、首组四关、一次中心接驳／购物与肺叶入口。其余六组、终极 Boss、长期经济、全部武器组合与真人手感待验证。"
+      "reason": "已覆盖原序章、首组四关、一次中心接驳／购物与肺叶入口。其余六组、终极 Boss、长期经济、全部武器组合与真人手感待验证。",
+      "scope": "内容与平衡"
     }
   ]
 }
