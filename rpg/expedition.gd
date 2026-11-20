@@ -1,6 +1,7 @@
 extends "res://game.gd"
 
 const RUN_SAVE = "user://expedition.cfg"
+const ENEMY_WINDUP := 0.75
 const EXIT = Vector2(500, 166)
 const GRAFT = Vector2(320, 169)
 const SHOP = Vector2(170, 193)
@@ -31,7 +32,6 @@ var heartbeat_left := 0.0
 
 func _ready() -> void:
 	super._ready()
-	tones["heartbeat"] = tone(67, 34, 0.20)
 	var save := ConfigFile.new()
 	if save.load(RUN_SAVE) == OK:
 		var data: Variant = save.get_value("expedition", "state", {})
@@ -62,10 +62,11 @@ func begin_expedition() -> void:
 	cleared = false
 	stock.clear()
 	sold.clear()
-	effects.clear()
 	build_id = "arc"
 	run_seed = randi_range(1, 1000000)
 	hp = 5
+	attack_cooldown = 0.0
+	dash_cooldown = 0.0
 	enter_room("hub")
 	set_screen("exp_loadout")
 	save_expedition()
@@ -126,9 +127,14 @@ func retry() -> void:
 		return
 	begin_expedition()
 
-func load_stage() -> void:
+func enter_room(next: String) -> void:
 	enemies.clear()
 	effects.clear()
+	graft_age = -1.0
+	heartbeat_left = 0.0
+	super.enter_room(next)
+
+func load_stage() -> void:
 	attack_cooldown = 0
 	dash_cooldown = 0
 	if stage in [-1, 4]:
@@ -154,8 +160,8 @@ func load_stage() -> void:
 
 func spawn_enemy(kind: String, p: Vector2) -> void:
 	enemies.append({"kind": kind, "p": p, "hp": 12 if kind == "sentinel" else 8,
-		"phase": "seek", "time": 0.7, "zone": Rect2(), "hit": false,
-		"dir": Vector2.DOWN, "hurt": 0.0, "dead": -1.0})
+		"phase": "seek", "time": 0.7, "zone": PackedVector2Array(), "hit": false,
+		"dir": Vector2.DOWN, "hurt": 0.0, "dead": -1.0, "kick": Vector2.ZERO})
 
 func depart() -> void:
 	if room != "hub" or screen != "play":
@@ -219,7 +225,7 @@ func buy(index: int) -> void:
 		build_id = id
 	else:
 		gear = id
-		hp = mini(hp + (2 if id == "plating" else 0), max_hp())
+		hp = mini(hp, max_hp())
 	cash -= 12
 	sold.append(index)
 	play_sound("open")
@@ -266,9 +272,10 @@ func attack(direction: Vector2) -> void:
 		return
 	if room == "hub" or attack_cooldown > 0 or dash_left > 0 or direction == Vector2.ZERO:
 		return
-	set_facing(direction)
+	begin_attack(direction)
 	attack_cooldown = float(WEAPONS[build_id].cooldown) * (0.85 if gear == "capacitor" else 1.0)
 	attack_windup = float(WEAPONS[build_id].windup)
+	attack_windup_total = attack_windup
 	attack_direction = direction
 
 func release_attack() -> void:
@@ -280,21 +287,24 @@ func release_attack() -> void:
 	attack_contact = attack_origin + attack_direction * float(WEAPONS[build_id].reach)
 	attack_distance = float(WEAPONS[build_id].reach)
 	attack_result = "miss"
+	var finisher := false
 	var damage: int = int(WEAPONS[build_id].damage) + tier * 2 + (1 if integrated else 0)
 	if room == "press" and boss_hp > 0 and can_hit(CORE):
-		attack_contact = CORE - Vector2(0, 38)
+		attack_contact = CORE - Vector2(0, 14 if build_id == "arc" else 38)
 		if boss_phase != "open":
 			attack_result = "guard"
-			play_sound("guard")
+			if build_id != "arc": aim_tracer_at_contact()
+			finish_attack()
 			notify("护板闭合。等核心青灯亮起。", 1.4)
 			return
 		boss_hp = maxi(0, boss_hp - damage)
 		boss_hurt_age = 0.0
 		boss_hurt_direction = attack_direction
 		attack_result = "hit"
-		if build_id != "arc":
-			attack_direction = (attack_contact - attack_origin).normalized()
+		if build_id == "nailer": aim_tracer_at_contact()
+		elif build_id == "probe": attack_direction = (attack_contact - attack_origin).normalized()
 		if boss_hp == 0:
+			finisher = true
 			boss_phase = "offline"
 			clear_stage()
 	else:
@@ -304,13 +314,19 @@ func release_attack() -> void:
 			attack_contact = e.p - Vector2(0, 16)
 			if e.kind == "sentinel" and e.phase != "recover" and attack_direction.dot(e.dir) < -0.4:
 				if attack_result != "hit": attack_result = "guard"
+				world.impact(attack_contact, -attack_direction, "metal", "guard")
 				notify("免疫守卫正面格挡。绕后或等它收招。", 1.5)
-				if build_id == "nailer": break
+				if build_id == "nailer":
+					aim_tracer_at_contact()
+					break
 				continue
 			e.hp = maxi(0, int(e.hp) - damage)
 			e.hurt = 0.18
+			if build_id == "nailer": aim_tracer_at_contact()
+			e.kick = attack_direction * (95 if build_id == "arc" else 65 if build_id == "probe" else 35) * (0.35 if e.kind == "sentinel" else 1.0)
+			var response := "heavy" if combo_step == 2 or e.hp == 0 else "light" if build_id == "nailer" else "hit"
+			world.impact(attack_contact, attack_direction, "metal" if e.kind == "sentinel" else "tissue", response)
 			attack_result = "hit"
-			effects.append({"id": &"tissue_hit", "age": 0.0, "p": attack_contact})
 			if e.hp == 0:
 				e.dead = 0.0
 				e.phase = "dead"
@@ -320,11 +336,7 @@ func release_attack() -> void:
 			if build_id == "nailer": break
 		if not enemies.is_empty() and enemies.all(func(e): return e.hp <= 0):
 			clear_stage()
-	if attack_result == "hit":
-		impact_pause = 0.05 if build_id == "arc" else 0.025
-		play_sound("arc_hit" if build_id == "arc" else "probe_hit")
-	else:
-		play_sound("guard" if attack_result == "guard" else ("arc_miss" if build_id == "arc" else "probe_miss"))
+	finish_attack(finisher)
 
 func can_hit(p: Vector2) -> bool:
 	var to := p - player
@@ -339,8 +351,8 @@ func clear_stage() -> void:
 	save_expedition()
 	notify("心核已释放。沿琥珀灯到出口，返回中心。" if stage == 3 else "通路已清理 · 工料 +6。前往右上出口。", 4)
 
-func take_hit() -> void:
-	super.take_hit()
+func take_hit(source: Vector2 = CORE) -> void:
+	super.take_hit(source)
 	if campaign and hp == 0:
 		# A dead expedition cannot be continued through its old room checkpoint.
 		saved_run.clear()
@@ -349,25 +361,35 @@ func take_hit() -> void:
 		if save.save(RUN_SAVE + ".tmp") != OK or DirAccess.rename_absolute(RUN_SAVE + ".tmp", RUN_SAVE) != OK:
 			push_error("Could not invalidate the defeated expedition checkpoint.")
 
+func _physics_process(dt: float) -> void:
+	if campaign and screen in ["play", "dying"]:
+		for fx in effects: fx.age += dt
+		effects = effects.filter(func(fx): return fx.age < 1.4)
+	super._physics_process(dt)
+
+func sound_scene() -> String:
+	if campaign and screen == "play" and room == "field" and not cleared: return "combat"
+	return super.sound_scene()
+
 func tick_play(dt: float) -> void:
-	var paused_hit := impact_pause > 0
 	var before := player
 	var evading := dash_left > 0
 	super.tick_play(dt)
-	if not campaign or paused_hit: return
+	if not campaign or screen != "play": return
 	if room == "hub" and integrated:
 		heartbeat_left -= dt
 		if heartbeat_left <= 0:
 			heartbeat_left = 0.9
-			if not audio.playing: play_sound("heartbeat")
+			play_sound("heartbeat")
 	if graft_age >= 0: graft_age += dt
-	for fx in effects: fx.age += dt
-	effects = effects.filter(func(fx): return fx.age < 1.4)
+	if room != "field": return
 	for e in enemies:
 		if e.hp <= 0:
-			e.dead += dt
+			if impact_pause <= 0.0: e.dead += dt
 			continue
-		e.hurt = maxf(0, float(e.hurt) - dt)
+		e.p = (e.p + e.kick * dt).clamp(Vector2(126, 150), Vector2(514, 280))
+		e.kick = e.kick.move_toward(Vector2.ZERO, 450 * dt)
+		if impact_pause <= 0.0: e.hurt = maxf(0, float(e.hurt) - dt)
 		e.time -= dt
 		var to: Vector2 = player - e.p
 		var reach := 106.0 if e.kind == "worker" else 58.0
@@ -379,27 +401,24 @@ func tick_play(dt: float) -> void:
 					e.p = (e.p + e.dir * speed * dt).clamp(Vector2(126, 150), Vector2(514, 280))
 				elif e.time <= 0:
 					e.phase = "warn"
-					e.time = 0.75
+					e.time = ENEMY_WINDUP
 					e.hit = false
-					var center: Vector2 = player if e.kind == "husk" else e.p + e.dir * 34
-					e.zone = Rect2(center - Vector2(27, 24), Vector2(54, 48))
-					if e.kind == "worker":
-						e.zone = Rect2(Vector2(minf(e.p.x, player.x), minf(e.p.y, player.y)) - Vector2(10, 10), to.abs() + Vector2(20, 20))
+					lock_enemy_attack(e)
+					play_sound("charge")
 			"warn":
 				if e.time <= 0:
 					e.phase = "strike"
 					e.time = 0.16
-					if e.kind == "husk": e.p = e.zone.get_center()
-					effects.append({"id": &"tissue_hit", "age": 0.0, "p": e.zone.get_center()})
+					release_enemy_attack(e)
 			"strike":
-				if not e.hit and (e.zone.has_point(player) or (evading and e.zone.has_point(before))):
+				if not e.hit and (enemy_attack_contains(e, player) or (evading and enemy_attack_contains(e, before))):
 					e.hit = true
 					if evading:
 						evade_flash = 0.35
 						evade_point = player
 						play_sound("evade")
 					elif hurt_flash <= 0:
-						take_hit()
+						take_hit(e.launch)
 						if screen == "dying": return
 				if e.time <= 0:
 					e.phase = "recover"
@@ -409,14 +428,51 @@ func tick_play(dt: float) -> void:
 					e.phase = "seek"
 					e.time = 0.3
 
+func lock_enemy_attack(e: Dictionary) -> void:
+	e.launch = e.p
+	e.kick = Vector2.ZERO
+	if e.dir == Vector2.ZERO:
+		e.dir = Vector2.DOWN
+	var direction: Vector2 = e.dir
+	var points := PackedVector2Array()
+	if e.kind == "husk":
+		e.aim = player
+		for i in 16:
+			points.append(player + Vector2.from_angle(i * TAU / 16) * Vector2(27, 24))
+	elif e.kind == "worker":
+		e.aim = player + direction * 10
+		var rear: Vector2 = e.p - direction * 8
+		var edge := direction.orthogonal() * 13
+		points = PackedVector2Array([rear + edge, e.aim + edge, e.aim - edge, rear - edge])
+	else:
+		e.aim = e.p + direction * 58
+		points.append(e.p)
+		for i in 13:
+			points.append(e.p + direction.rotated(lerpf(-0.84, 0.84, i / 12.0)) * 68)
+	e.zone = points
+
+func enemy_attack_contains(e: Dictionary, point: Vector2) -> bool:
+	return Geometry2D.is_point_in_polygon(point, e.zone)
+
+func release_enemy_attack(e: Dictionary) -> void:
+	var origin: Vector2 = e.launch.lerp(e.aim, 0.55)
+	var recipe := &"shield_slam"
+	match e.kind:
+		"husk":
+			e.p = e.aim
+			origin = e.aim
+			recipe = &"pounce_rake"
+		"worker":
+			recipe = &"wrench_arc"
+	effects.append({"id": recipe, "age": 0.0, "p": origin, "angle": e.dir.angle()})
+	if e.kind == "sentinel": world.feedback.kick(0.38)
+	play_sound("sweep" if e.kind == "worker" else "slam" if e.kind == "sentinel" else "dash")
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if screen == "exp_loadout":
 			if event.physical_keycode == KEY_1: choose_expedition("arc")
 			if event.physical_keycode == KEY_2: choose_expedition("probe")
-			return
-		if screen == "shop" and event.physical_keycode == KEY_ESCAPE:
-			resume()
 			return
 	super._unhandled_input(event)
 

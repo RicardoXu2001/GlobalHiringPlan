@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "logical_floor": [112,135,416,159],
+  "foot_radius": 5,
+  "spawn": [320,278],
+  "exit": [500,166],
+  "archive": [146,202],
+  "walk_speed": 116,
+  "dodge_speed": 355,
+  "dodge_seconds": 0.16,
+  "min_clear_corridor": 32,
+  "min_initial_enemy_distance": 64,
+  "layout_notes": "Ground footprints in logical pixels. Boss spawn is an anchor inside the body. Optional mirrored layouts use x=640-x. Elite pool does not remove safe openings.",
+  "layouts": {
+    "wide": {"walls":[],"spawns":[[292,174],[415,191]]},
+    "flanks": {"walls":[[265,183,64,22],[396,226,39,16]],"spawns":[[314,161],[438,176]]},
+    "cross": {"walls":[[224,194,68,24],[354,192,42,28]],"spawns":[[314,156],[412,154]]},
+    "islands": {"walls":[[201,170,38,34],[377,159,36,31],[434,225,34,22]],"spawns":[[314,157],[464,170]]},
+    "spine": {"walls":[[277,157,62,28],[313,217,49,20]],"spawns":[[251,177],[424,176]]},
+    "loop": {"walls":[[233,188,54,31],[371,180,57,42]],"spawns":[[329,154],[449,185]]},
+    "forge": {"walls":[[274,135,92,39]],"spawns":[[320,158]]},
+    "twin": {"walls":[[240,147,63,32],[365,147,63,32],[432,218,26,22]],"spawns":[[337,160]]},
+    "core": {"walls":[[220,194,29,24],[391,194,29,24],[289,135,68,30]],"spawns":[[324,173]]}
+  },
+  "zones": [
+    {
+      "name": "心泵", "organ": "心核", "normal_hp": [8,12], "boss_hp": 32, "isolation": false,
+      "rooms": [
+        {"id":"01","name":"供给前廊","kind":"teach","intensity":0.32,"layouts":["wide","flanks"]},
+        {"id":"02","name":"转运通道","kind":"develop","intensity":0.49,"layouts":["flanks","wide"]},
+        {"id":"03","name":"拘束侧室","kind":"test","intensity":0.63,"layouts":["loop"]},
+        {"id":"04","name":"压维守卫","kind":"climax","intensity":0.75,"layouts":["forge"]}
+      ]
+    },
+    {
+      "name": "肺叶", "organ": "肺囊", "normal_hp": [20,26], "boss_hp": 58, "isolation": true,
+      "rooms": [
+        {"id":"05","name":"肺叶入口","kind":"teach","intensity":0.35,"layouts":["wide","flanks"]},
+        {"id":"06","name":"双叶风室","kind":"develop","intensity":0.53,"layouts":["flanks","loop"]},
+        {"id":"07","name":"逆风滤网","kind":"test","intensity":0.67,"layouts":["cross"]},
+        {"id":"08","name":"呼吸钳","kind":"climax","intensity":0.79,"layouts":["twin"]}
+      ]
+    },
+    {
+      "name": "眼", "organ": "复眼", "normal_hp": [24,32], "boss_hp": 80, "isolation": false,
+      "rooms": [
+        {"id":"09","name":"视神经井","kind":"teach","intensity":0.38,"layouts":["islands","flanks"]},
+        {"id":"10","name":"镜片分拣","kind":"develop","intensity":0.56,"layouts":["flanks","cross"]},
+        {"id":"11","name":"失焦廊","kind":"test","intensity":0.7,"layouts":["spine","flanks"]},
+        {"id":"12","name":"盲巡镜","kind":"climax","intensity":0.82,"layouts":["twin"]}
+      ]
+    },
+    {
+      "name": "喉", "organ": "声带", "normal_hp": [31,39], "boss_hp": 102, "isolation": false,
+      "rooms": [
+        {"id":"13","name":"回声坡道","kind":"teach","intensity":0.41,"layouts":["wide","flanks"]},
+        {"id":"14","name":"声纹调度间","kind":"develop","intensity":0.6,"layouts":["cross","flanks"]},
+        {"id":"15","name":"静默间","kind":"test","intensity":0.73,"layouts":["loop","wide"]},
+        {"id":"16","name":"传令器","kind":"climax","intensity":0.85,"layouts":["forge"]}
+      ]
+    },
+    {
+      "name": "肠", "organ": "消化腺", "normal_hp": [36,46], "boss_hp": 126, "isolation": true,
+      "rooms": [
+        {"id":"17","name":"循环滤池","kind":"teach","intensity":0.44,"layouts":["wide","flanks"]},
+        {"id":"18","name":"双供养线","kind":"develop","intensity":0.63,"layouts":["loop","wide"]},
+        {"id":"19","name":"沉降罐","kind":"test","intensity":0.77,"layouts":["cross","loop"]},
+        {"id":"20","name":"分食阀","kind":"climax","intensity":0.89,"layouts":["twin"]}
+      ]
+    },
+    {
+      "name": "脊髓", "organ": "神经束", "normal_hp": [42,52], "boss_hp": 155, "isolation": false,
+      "rooms": [
+        {"id":"21","name":"反射弧","kind":"teach","intensity":0.47,"layouts":["spine","flanks"]},
+        {"id":"22","name":"髓鞘栈桥","kind":"develop","intensity":0.67,"layouts":["flanks","loop"]},
+        {"id":"23","name":"迭代存档室","kind":"test","intensity":0.81,"layouts":["islands","cross"]},
+        {"id":"24","name":"逆行反射器","kind":"climax","intensity":0.93,"layouts":["forge"]}
+      ]
+    },
+    {
+      "name": "胎室", "organ": "生殖核", "normal_hp": [47,59], "boss_hp": 188, "isolation": true,
+      "rooms": [
+        {"id":"25","name":"胎膜外围","kind":"teach","intensity":0.51,"layouts":["loop","flanks"]},
+        {"id":"26","name":"维生架","kind":"develop","intensity":0.71,"layouts":["cross"]},
+        {"id":"27","name":"接生台","kind":"test","intensity":0.84,"layouts":["spine","flanks"]},
+        {"id":"28","name":"维生架主任","kind":"climax","intensity":0.96,"layouts":["twin"]}
+      ]
+    }
+  ],
+  "final": {"id":"29","name":"核心内腔 · 初啼","kind":"climax","intensity":1.0,"layouts":["core"],"hp":256,"max_growth":0.12}
+}

@@ -12,7 +12,7 @@ targetFinish: 可在 Windows Godot 中完整游玩的重构切片，采用 ART-2
 | --- | --- | --- |
 | 首屏 | [标题](../qa/title.png) | 左侧文字保护区，右侧供给架与小人物，材质统一 |
 | 地面与敌群 | [拘束侧室](../qa/expedition-room3.png) | 低纹理走道、不同敌形、清楚脚点 |
-| Boss 与预警 | [守卫预警](../qa/expedition-guardian-warn.png) | 血肉背景不冒充危险，警红边框高于装饰特效 |
+| Boss 与预警 | [守卫预警](../qa/expedition-guardian-warn.png) | 预警轨道沿箭纹给出压降和横扫方向，发光碎屑快速退去 |
 | 中心状态 | [心核接驳](../qa/expedition-graft.png) | 同一装置保留钢架与锚点，心核接入可辨 |
 | 武器与装备 | [武器铺](../qa/expedition-shop.png)、[选装](../qa/weapons.png) | 实物图等比缩放，图标和文字都在容器内 |
 | 动作与结果 | [短弧](../qa/combat-arc.png)、[受伤](../qa/player-hurt.png)、[倒地](../qa/player-dead.png) | 新精灵与现有 PixelFX 配合，反馈不改变规则窗口 |
@@ -33,3 +33,7 @@ targetFinish: 可在 Windows Godot 中完整游玩的重构切片，采用 ART-2
 `art-direction-board.png`、`01-title.png`、`02-exploration.png`、`03-pressure.png` 及 `draw_studies.py` 为 ART-1.0 的原创布局草图，保留作构图历史；它们的几何精细度与 16 色限制已被 ART-2 替代。
 
 早期用户参考截图只提供光色、块面与尺度关系，原图不收入生产资源。当前母稿由内置 image_gen 结合项目参考生成并保留，提示词见 [生产记录](../rpg/art/modular/PROMPTS.md)与[首批记录](visual-targets/sprite-review-v1/PROMPTS.md)。发行前仍需完成最终资产与字体的来源确认；本文件不将生成或自动化验证当作发行权结论。
+
+## 0.2.2 战斗与环境反馈
+
+[实际输入动态](../qa/combat-feel.gif) · [冷却罐连锁](../qa/feedback-coolant-burst.png) · [落地痕迹](../qa/feedback-surface-marks.png)。检查动作衔接、接触方向与表面残留，确认粒子释放后仍能读出攻击方向。参数与完整材料模拟的边界见 [COMBAT_FEEL](COMBAT_FEEL.md)。

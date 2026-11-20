@@ -209,6 +209,8 @@ func run() -> void:
 		return
 	var dead_position: Vector2 = game.player
 	var frozen_boss_time: float = game.boss_time
+	if not expect(game.boss_fx_age >= 0.0, "Fatal strike retains its release effect"):
+		return
 	send_key(KEY_W, true)
 	await tap(KEY_SPACE)
 	await tap(KEY_J)
@@ -221,8 +223,8 @@ func run() -> void:
 	await capture("player-knockdown.png")
 	record("player-knocked-down")
 	await until(func(): return game.death_age >= 0.65, 0.7)
-	if not expect(game.screen == "dying" and game.boss_time == frozen_boss_time and game.saved_stage == 0,
-			"Death animation freezes combat without advancing the iteration"):
+	if not expect(game.screen == "dying" and game.boss_time == frozen_boss_time and game.saved_stage == 0 and game.boss_fx_age < 0.0,
+			"Fatal VFX fades while combat state and iteration stay frozen"):
 		return
 	await capture("player-dead.png")
 	if not await until(func(): return game.screen == "failed", 2):
@@ -314,13 +316,18 @@ func until(predicate: Callable, timeout: float) -> bool:
 	return predicate.call() and not finished
 
 func walk(target: Vector2) -> void:
-	for axis in 2:
+	var across: Vector2 = game.world.slide_on_floor(game.player, Vector2(target.x - game.player.x, 0))
+	var axes := [1, 0] if absf(across.x - target.x) >= 6 else [0, 1]
+	for axis in axes:
 		var difference: float = target[axis] - game.player[axis]
 		if absf(difference) <= 5:
 			continue
 		var key: Key = (KEY_D if difference > 0 else KEY_A) if axis == 0 else (KEY_S if difference > 0 else KEY_W)
 		send_key(key, true)
-		var arrived := await until(func(): return absf(target[axis] - game.player[axis]) < 6, 3)
+		var arrived := await until(func():
+			# Focus loss releases keys; resume the held test input after focus returns.
+			if root.has_focus() and not Input.is_physical_key_pressed(key): send_key(key, true)
+			return absf(target[axis] - game.player[axis]) < 6, 3)
 		send_key(key, false)
 		if not arrived:
 			fail("Movement did not reach %s from %s (focus=%s)" % [target, game.player, root.has_focus()])
@@ -333,25 +340,33 @@ func send_key(key: Key, down: bool) -> void:
 	event.physical_keycode = key
 	event.pressed = down
 	Input.parse_input_event(event)
+	Input.flush_buffered_events()
 
 func tap(key: Key) -> void:
+	if not root.has_focus():
+		root.grab_focus()
+		await until(func(): return root.has_focus(), 0.5)
+		await process_frame
 	send_key(key, true)
+	await physics_frame
 	await process_frame
 	send_key(key, false)
-	await process_frame
+	await RenderingServer.frame_post_draw
 
 func click_at(world_position: Vector2) -> void:
 	if not root.has_focus(): root.grab_focus()
 	var event := InputEventMouseButton.new()
 	event.button_index = MOUSE_BUTTON_LEFT
-	event.position = game.presentation.position + world_position * (game.presentation.size.x / 640.0)
+	event.position = game.presentation.position + (world_position + game.world.position * 0.5) * (game.presentation.size.x / 640.0)
 	event.pressed = true
 	Input.parse_input_event(event)
+	Input.flush_buffered_events()
 	await process_frame
 	event = event.duplicate()
 	event.pressed = false
 	Input.parse_input_event(event)
-	await process_frame
+	Input.flush_buffered_events()
+	await RenderingServer.frame_post_draw
 
 func expect(condition: bool, label: String) -> bool:
 	if not condition:

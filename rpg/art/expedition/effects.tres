@@ -2,7 +2,19 @@
 
 [ext_resource type="Texture2D" path="res://art/expedition/tissue_hit.png" id="tissue_hit"]
 
+[ext_resource type="Texture2D" path="res://art/expedition/metal_hit.png" id="metal_hit"]
+
+[ext_resource type="Texture2D" path="res://art/expedition/shield_contact.png" id="shield_contact"]
+
+[ext_resource type="Texture2D" path="res://art/expedition/heavy_contact.png" id="heavy_contact"]
+
 [ext_resource type="Texture2D" path="res://art/expedition/organ_collect.png" id="organ_collect"]
+
+[ext_resource type="Texture2D" path="res://art/expedition/pounce_rake.png" id="pounce_rake"]
+
+[ext_resource type="Texture2D" path="res://art/expedition/wrench_arc.png" id="wrench_arc"]
+
+[ext_resource type="Texture2D" path="res://art/expedition/shield_slam.png" id="shield_slam"]
 
 [sub_resource type="AtlasTexture" id="tissue_hit_0"]
 atlas = ExtResource("tissue_hit")
@@ -21,67 +33,162 @@ filter_clip = true
 
 [sub_resource type="AtlasTexture" id="tissue_hit_3"]
 atlas = ExtResource("tissue_hit")
-region = Rect2(408, 0, 136, 80)
+region = Rect2(0, 80, 136, 80)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="tissue_hit_4"]
 atlas = ExtResource("tissue_hit")
-region = Rect2(0, 80, 136, 80)
+region = Rect2(136, 80, 136, 80)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="tissue_hit_5"]
 atlas = ExtResource("tissue_hit")
-region = Rect2(136, 80, 136, 80)
+region = Rect2(272, 80, 136, 80)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="tissue_hit_6"]
 atlas = ExtResource("tissue_hit")
-region = Rect2(272, 80, 136, 80)
+region = Rect2(0, 160, 136, 80)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="tissue_hit_7"]
 atlas = ExtResource("tissue_hit")
-region = Rect2(408, 80, 136, 80)
-filter_clip = true
-
-[sub_resource type="AtlasTexture" id="tissue_hit_8"]
-atlas = ExtResource("tissue_hit")
-region = Rect2(0, 160, 136, 80)
-filter_clip = true
-
-[sub_resource type="AtlasTexture" id="tissue_hit_9"]
-atlas = ExtResource("tissue_hit")
 region = Rect2(136, 160, 136, 80)
 filter_clip = true
 
-[sub_resource type="AtlasTexture" id="tissue_hit_10"]
-atlas = ExtResource("tissue_hit")
-region = Rect2(272, 160, 136, 80)
+[sub_resource type="AtlasTexture" id="metal_hit_0"]
+atlas = ExtResource("metal_hit")
+region = Rect2(0, 0, 136, 80)
 filter_clip = true
 
-[sub_resource type="AtlasTexture" id="tissue_hit_11"]
-atlas = ExtResource("tissue_hit")
-region = Rect2(408, 160, 136, 80)
+[sub_resource type="AtlasTexture" id="metal_hit_1"]
+atlas = ExtResource("metal_hit")
+region = Rect2(136, 0, 136, 80)
 filter_clip = true
 
-[sub_resource type="AtlasTexture" id="tissue_hit_12"]
-atlas = ExtResource("tissue_hit")
-region = Rect2(0, 240, 136, 80)
+[sub_resource type="AtlasTexture" id="metal_hit_2"]
+atlas = ExtResource("metal_hit")
+region = Rect2(272, 0, 136, 80)
 filter_clip = true
 
-[sub_resource type="AtlasTexture" id="tissue_hit_13"]
-atlas = ExtResource("tissue_hit")
-region = Rect2(136, 240, 136, 80)
+[sub_resource type="AtlasTexture" id="metal_hit_3"]
+atlas = ExtResource("metal_hit")
+region = Rect2(0, 80, 136, 80)
 filter_clip = true
 
-[sub_resource type="AtlasTexture" id="tissue_hit_14"]
-atlas = ExtResource("tissue_hit")
-region = Rect2(272, 240, 136, 80)
+[sub_resource type="AtlasTexture" id="metal_hit_4"]
+atlas = ExtResource("metal_hit")
+region = Rect2(136, 80, 136, 80)
 filter_clip = true
 
-[sub_resource type="AtlasTexture" id="tissue_hit_15"]
-atlas = ExtResource("tissue_hit")
-region = Rect2(408, 240, 136, 80)
+[sub_resource type="AtlasTexture" id="metal_hit_5"]
+atlas = ExtResource("metal_hit")
+region = Rect2(272, 80, 136, 80)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="metal_hit_6"]
+atlas = ExtResource("metal_hit")
+region = Rect2(0, 160, 136, 80)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_contact_0"]
+atlas = ExtResource("shield_contact")
+region = Rect2(0, 0, 200, 112)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_contact_1"]
+atlas = ExtResource("shield_contact")
+region = Rect2(200, 0, 200, 112)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_contact_2"]
+atlas = ExtResource("shield_contact")
+region = Rect2(400, 0, 200, 112)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_contact_3"]
+atlas = ExtResource("shield_contact")
+region = Rect2(0, 112, 200, 112)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_contact_4"]
+atlas = ExtResource("shield_contact")
+region = Rect2(200, 112, 200, 112)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_contact_5"]
+atlas = ExtResource("shield_contact")
+region = Rect2(400, 112, 200, 112)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_contact_6"]
+atlas = ExtResource("shield_contact")
+region = Rect2(0, 224, 200, 112)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_contact_7"]
+atlas = ExtResource("shield_contact")
+region = Rect2(200, 224, 200, 112)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_0"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(0, 0, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_1"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(216, 0, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_2"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(432, 0, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_3"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(0, 136, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_4"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(216, 136, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_5"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(432, 136, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_6"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(0, 272, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_7"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(216, 272, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_8"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(432, 272, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_9"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(0, 408, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_10"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(216, 408, 216, 136)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="heavy_contact_11"]
+atlas = ExtResource("heavy_contact")
+region = Rect2(432, 408, 216, 136)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="organ_collect_0"]
@@ -294,6 +401,242 @@ atlas = ExtResource("organ_collect")
 region = Rect2(672, 540, 112, 108)
 filter_clip = true
 
+[sub_resource type="AtlasTexture" id="pounce_rake_0"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(0, 0, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_1"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(128, 0, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_2"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(256, 0, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_3"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(384, 0, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_4"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(0, 96, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_5"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(128, 96, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_6"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(256, 96, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_7"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(384, 96, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_8"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(0, 192, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_9"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(128, 192, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_10"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(256, 192, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_11"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(384, 192, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="pounce_rake_12"]
+atlas = ExtResource("pounce_rake")
+region = Rect2(0, 288, 128, 96)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_0"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(0, 0, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_1"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(136, 0, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_2"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(272, 0, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_3"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(408, 0, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_4"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(0, 104, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_5"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(136, 104, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_6"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(272, 104, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_7"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(408, 104, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_8"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(0, 208, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_9"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(136, 208, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_10"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(272, 208, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="wrench_arc_11"]
+atlas = ExtResource("wrench_arc")
+region = Rect2(408, 208, 136, 104)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_0"]
+atlas = ExtResource("shield_slam")
+region = Rect2(0, 0, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_1"]
+atlas = ExtResource("shield_slam")
+region = Rect2(288, 0, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_2"]
+atlas = ExtResource("shield_slam")
+region = Rect2(576, 0, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_3"]
+atlas = ExtResource("shield_slam")
+region = Rect2(864, 0, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_4"]
+atlas = ExtResource("shield_slam")
+region = Rect2(0, 208, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_5"]
+atlas = ExtResource("shield_slam")
+region = Rect2(288, 208, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_6"]
+atlas = ExtResource("shield_slam")
+region = Rect2(576, 208, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_7"]
+atlas = ExtResource("shield_slam")
+region = Rect2(864, 208, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_8"]
+atlas = ExtResource("shield_slam")
+region = Rect2(0, 416, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_9"]
+atlas = ExtResource("shield_slam")
+region = Rect2(288, 416, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_10"]
+atlas = ExtResource("shield_slam")
+region = Rect2(576, 416, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_11"]
+atlas = ExtResource("shield_slam")
+region = Rect2(864, 416, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_12"]
+atlas = ExtResource("shield_slam")
+region = Rect2(0, 624, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_13"]
+atlas = ExtResource("shield_slam")
+region = Rect2(288, 624, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_14"]
+atlas = ExtResource("shield_slam")
+region = Rect2(576, 624, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_15"]
+atlas = ExtResource("shield_slam")
+region = Rect2(864, 624, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_16"]
+atlas = ExtResource("shield_slam")
+region = Rect2(0, 832, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_17"]
+atlas = ExtResource("shield_slam")
+region = Rect2(288, 832, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_18"]
+atlas = ExtResource("shield_slam")
+region = Rect2(576, 832, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_19"]
+atlas = ExtResource("shield_slam")
+region = Rect2(864, 832, 288, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="shield_slam_20"]
+atlas = ExtResource("shield_slam")
+region = Rect2(0, 1040, 288, 208)
+filter_clip = true
+
 [resource]
-animations = [{"frames": [{"duration": 1.0, "texture": SubResource("tissue_hit_0")}, {"duration": 1.0, "texture": SubResource("tissue_hit_1")}, {"duration": 1.0, "texture": SubResource("tissue_hit_2")}, {"duration": 1.0, "texture": SubResource("tissue_hit_3")}, {"duration": 1.0, "texture": SubResource("tissue_hit_4")}, {"duration": 1.0, "texture": SubResource("tissue_hit_5")}, {"duration": 1.0, "texture": SubResource("tissue_hit_6")}, {"duration": 1.0, "texture": SubResource("tissue_hit_7")}, {"duration": 1.0, "texture": SubResource("tissue_hit_8")}, {"duration": 1.0, "texture": SubResource("tissue_hit_9")}, {"duration": 1.0, "texture": SubResource("tissue_hit_10")}, {"duration": 1.0, "texture": SubResource("tissue_hit_11")}, {"duration": 1.0, "texture": SubResource("tissue_hit_12")}, {"duration": 1.0, "texture": SubResource("tissue_hit_13")}, {"duration": 1.0, "texture": SubResource("tissue_hit_14")}, {"duration": 1.0, "texture": SubResource("tissue_hit_15")}], "loop": false, "name": &"tissue_hit", "speed": 30.0},
-{"frames": [{"duration": 1.0, "texture": SubResource("organ_collect_0")}, {"duration": 1.0, "texture": SubResource("organ_collect_1")}, {"duration": 1.0, "texture": SubResource("organ_collect_2")}, {"duration": 1.0, "texture": SubResource("organ_collect_3")}, {"duration": 1.0, "texture": SubResource("organ_collect_4")}, {"duration": 1.0, "texture": SubResource("organ_collect_5")}, {"duration": 1.0, "texture": SubResource("organ_collect_6")}, {"duration": 1.0, "texture": SubResource("organ_collect_7")}, {"duration": 1.0, "texture": SubResource("organ_collect_8")}, {"duration": 1.0, "texture": SubResource("organ_collect_9")}, {"duration": 1.0, "texture": SubResource("organ_collect_10")}, {"duration": 1.0, "texture": SubResource("organ_collect_11")}, {"duration": 1.0, "texture": SubResource("organ_collect_12")}, {"duration": 1.0, "texture": SubResource("organ_collect_13")}, {"duration": 1.0, "texture": SubResource("organ_collect_14")}, {"duration": 1.0, "texture": SubResource("organ_collect_15")}, {"duration": 1.0, "texture": SubResource("organ_collect_16")}, {"duration": 1.0, "texture": SubResource("organ_collect_17")}, {"duration": 1.0, "texture": SubResource("organ_collect_18")}, {"duration": 1.0, "texture": SubResource("organ_collect_19")}, {"duration": 1.0, "texture": SubResource("organ_collect_20")}, {"duration": 1.0, "texture": SubResource("organ_collect_21")}, {"duration": 1.0, "texture": SubResource("organ_collect_22")}, {"duration": 1.0, "texture": SubResource("organ_collect_23")}, {"duration": 1.0, "texture": SubResource("organ_collect_24")}, {"duration": 1.0, "texture": SubResource("organ_collect_25")}, {"duration": 1.0, "texture": SubResource("organ_collect_26")}, {"duration": 1.0, "texture": SubResource("organ_collect_27")}, {"duration": 1.0, "texture": SubResource("organ_collect_28")}, {"duration": 1.0, "texture": SubResource("organ_collect_29")}, {"duration": 1.0, "texture": SubResource("organ_collect_30")}, {"duration": 1.0, "texture": SubResource("organ_collect_31")}, {"duration": 1.0, "texture": SubResource("organ_collect_32")}, {"duration": 1.0, "texture": SubResource("organ_collect_33")}, {"duration": 1.0, "texture": SubResource("organ_collect_34")}, {"duration": 1.0, "texture": SubResource("organ_collect_35")}, {"duration": 1.0, "texture": SubResource("organ_collect_36")}, {"duration": 1.0, "texture": SubResource("organ_collect_37")}, {"duration": 1.0, "texture": SubResource("organ_collect_38")}, {"duration": 1.0, "texture": SubResource("organ_collect_39")}, {"duration": 1.0, "texture": SubResource("organ_collect_40")}, {"duration": 1.0, "texture": SubResource("organ_collect_41")}], "loop": false, "name": &"organ_collect", "speed": 30.0}]
+animations = [{"frames": [{"duration": 1.0, "texture": SubResource("tissue_hit_0")}, {"duration": 1.0, "texture": SubResource("tissue_hit_1")}, {"duration": 1.0, "texture": SubResource("tissue_hit_2")}, {"duration": 1.0, "texture": SubResource("tissue_hit_3")}, {"duration": 1.0, "texture": SubResource("tissue_hit_4")}, {"duration": 1.0, "texture": SubResource("tissue_hit_5")}, {"duration": 1.0, "texture": SubResource("tissue_hit_6")}, {"duration": 1.0, "texture": SubResource("tissue_hit_7")}], "loop": false, "name": &"tissue_hit", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("metal_hit_0")}, {"duration": 1.0, "texture": SubResource("metal_hit_1")}, {"duration": 1.0, "texture": SubResource("metal_hit_2")}, {"duration": 1.0, "texture": SubResource("metal_hit_3")}, {"duration": 1.0, "texture": SubResource("metal_hit_4")}, {"duration": 1.0, "texture": SubResource("metal_hit_5")}, {"duration": 1.0, "texture": SubResource("metal_hit_6")}], "loop": false, "name": &"metal_hit", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("shield_contact_0")}, {"duration": 1.0, "texture": SubResource("shield_contact_1")}, {"duration": 1.0, "texture": SubResource("shield_contact_2")}, {"duration": 1.0, "texture": SubResource("shield_contact_3")}, {"duration": 1.0, "texture": SubResource("shield_contact_4")}, {"duration": 1.0, "texture": SubResource("shield_contact_5")}, {"duration": 1.0, "texture": SubResource("shield_contact_6")}, {"duration": 1.0, "texture": SubResource("shield_contact_7")}], "loop": false, "name": &"shield_contact", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("heavy_contact_0")}, {"duration": 1.0, "texture": SubResource("heavy_contact_1")}, {"duration": 1.0, "texture": SubResource("heavy_contact_2")}, {"duration": 1.0, "texture": SubResource("heavy_contact_3")}, {"duration": 1.0, "texture": SubResource("heavy_contact_4")}, {"duration": 1.0, "texture": SubResource("heavy_contact_5")}, {"duration": 1.0, "texture": SubResource("heavy_contact_6")}, {"duration": 1.0, "texture": SubResource("heavy_contact_7")}, {"duration": 1.0, "texture": SubResource("heavy_contact_8")}, {"duration": 1.0, "texture": SubResource("heavy_contact_9")}, {"duration": 1.0, "texture": SubResource("heavy_contact_10")}, {"duration": 1.0, "texture": SubResource("heavy_contact_11")}], "loop": false, "name": &"heavy_contact", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("organ_collect_0")}, {"duration": 1.0, "texture": SubResource("organ_collect_1")}, {"duration": 1.0, "texture": SubResource("organ_collect_2")}, {"duration": 1.0, "texture": SubResource("organ_collect_3")}, {"duration": 1.0, "texture": SubResource("organ_collect_4")}, {"duration": 1.0, "texture": SubResource("organ_collect_5")}, {"duration": 1.0, "texture": SubResource("organ_collect_6")}, {"duration": 1.0, "texture": SubResource("organ_collect_7")}, {"duration": 1.0, "texture": SubResource("organ_collect_8")}, {"duration": 1.0, "texture": SubResource("organ_collect_9")}, {"duration": 1.0, "texture": SubResource("organ_collect_10")}, {"duration": 1.0, "texture": SubResource("organ_collect_11")}, {"duration": 1.0, "texture": SubResource("organ_collect_12")}, {"duration": 1.0, "texture": SubResource("organ_collect_13")}, {"duration": 1.0, "texture": SubResource("organ_collect_14")}, {"duration": 1.0, "texture": SubResource("organ_collect_15")}, {"duration": 1.0, "texture": SubResource("organ_collect_16")}, {"duration": 1.0, "texture": SubResource("organ_collect_17")}, {"duration": 1.0, "texture": SubResource("organ_collect_18")}, {"duration": 1.0, "texture": SubResource("organ_collect_19")}, {"duration": 1.0, "texture": SubResource("organ_collect_20")}, {"duration": 1.0, "texture": SubResource("organ_collect_21")}, {"duration": 1.0, "texture": SubResource("organ_collect_22")}, {"duration": 1.0, "texture": SubResource("organ_collect_23")}, {"duration": 1.0, "texture": SubResource("organ_collect_24")}, {"duration": 1.0, "texture": SubResource("organ_collect_25")}, {"duration": 1.0, "texture": SubResource("organ_collect_26")}, {"duration": 1.0, "texture": SubResource("organ_collect_27")}, {"duration": 1.0, "texture": SubResource("organ_collect_28")}, {"duration": 1.0, "texture": SubResource("organ_collect_29")}, {"duration": 1.0, "texture": SubResource("organ_collect_30")}, {"duration": 1.0, "texture": SubResource("organ_collect_31")}, {"duration": 1.0, "texture": SubResource("organ_collect_32")}, {"duration": 1.0, "texture": SubResource("organ_collect_33")}, {"duration": 1.0, "texture": SubResource("organ_collect_34")}, {"duration": 1.0, "texture": SubResource("organ_collect_35")}, {"duration": 1.0, "texture": SubResource("organ_collect_36")}, {"duration": 1.0, "texture": SubResource("organ_collect_37")}, {"duration": 1.0, "texture": SubResource("organ_collect_38")}, {"duration": 1.0, "texture": SubResource("organ_collect_39")}, {"duration": 1.0, "texture": SubResource("organ_collect_40")}, {"duration": 1.0, "texture": SubResource("organ_collect_41")}], "loop": false, "name": &"organ_collect", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("pounce_rake_0")}, {"duration": 1.0, "texture": SubResource("pounce_rake_1")}, {"duration": 1.0, "texture": SubResource("pounce_rake_2")}, {"duration": 1.0, "texture": SubResource("pounce_rake_3")}, {"duration": 1.0, "texture": SubResource("pounce_rake_4")}, {"duration": 1.0, "texture": SubResource("pounce_rake_5")}, {"duration": 1.0, "texture": SubResource("pounce_rake_6")}, {"duration": 1.0, "texture": SubResource("pounce_rake_7")}, {"duration": 1.0, "texture": SubResource("pounce_rake_8")}, {"duration": 1.0, "texture": SubResource("pounce_rake_9")}, {"duration": 1.0, "texture": SubResource("pounce_rake_10")}, {"duration": 1.0, "texture": SubResource("pounce_rake_11")}, {"duration": 1.0, "texture": SubResource("pounce_rake_12")}], "loop": false, "name": &"pounce_rake", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("wrench_arc_0")}, {"duration": 1.0, "texture": SubResource("wrench_arc_1")}, {"duration": 1.0, "texture": SubResource("wrench_arc_2")}, {"duration": 1.0, "texture": SubResource("wrench_arc_3")}, {"duration": 1.0, "texture": SubResource("wrench_arc_4")}, {"duration": 1.0, "texture": SubResource("wrench_arc_5")}, {"duration": 1.0, "texture": SubResource("wrench_arc_6")}, {"duration": 1.0, "texture": SubResource("wrench_arc_7")}, {"duration": 1.0, "texture": SubResource("wrench_arc_8")}, {"duration": 1.0, "texture": SubResource("wrench_arc_9")}, {"duration": 1.0, "texture": SubResource("wrench_arc_10")}, {"duration": 1.0, "texture": SubResource("wrench_arc_11")}], "loop": false, "name": &"wrench_arc", "speed": 30.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("shield_slam_0")}, {"duration": 1.0, "texture": SubResource("shield_slam_1")}, {"duration": 1.0, "texture": SubResource("shield_slam_2")}, {"duration": 1.0, "texture": SubResource("shield_slam_3")}, {"duration": 1.0, "texture": SubResource("shield_slam_4")}, {"duration": 1.0, "texture": SubResource("shield_slam_5")}, {"duration": 1.0, "texture": SubResource("shield_slam_6")}, {"duration": 1.0, "texture": SubResource("shield_slam_7")}, {"duration": 1.0, "texture": SubResource("shield_slam_8")}, {"duration": 1.0, "texture": SubResource("shield_slam_9")}, {"duration": 1.0, "texture": SubResource("shield_slam_10")}, {"duration": 1.0, "texture": SubResource("shield_slam_11")}, {"duration": 1.0, "texture": SubResource("shield_slam_12")}, {"duration": 1.0, "texture": SubResource("shield_slam_13")}, {"duration": 1.0, "texture": SubResource("shield_slam_14")}, {"duration": 1.0, "texture": SubResource("shield_slam_15")}, {"duration": 1.0, "texture": SubResource("shield_slam_16")}, {"duration": 1.0, "texture": SubResource("shield_slam_17")}, {"duration": 1.0, "texture": SubResource("shield_slam_18")}, {"duration": 1.0, "texture": SubResource("shield_slam_19")}, {"duration": 1.0, "texture": SubResource("shield_slam_20")}], "loop": false, "name": &"shield_slam", "speed": 30.0}]

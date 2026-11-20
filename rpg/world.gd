@@ -15,8 +15,11 @@ const SOOT = Color("#493b37")
 const BRASS = Color("#897451")
 const FLESH = Color("#492c42")
 const ROSE = Color("#9c626c")
+const THREAT := Color("#f59479")
+const RAKE := Color("#ee819d")
 const COMBAT_FX: SpriteFrames = preload("res://art/combat/effects.tres")
 const EXP_FX: SpriteFrames = preload("res://art/expedition/effects.tres")
+const ImpactField = preload("res://impact_field.gd")
 const HERO_FRAMES: SpriteFrames = preload("res://art/modular/09.tres")
 const ENEMY_FRAMES = {"husk": preload("res://art/modular/husk.tres"), "worker": preload("res://art/modular/worker.tres"), "sentinel": preload("res://art/modular/sentinel.tres")}
 const MODULES = {
@@ -27,6 +30,8 @@ const MODULES = {
 	"armor": preload("res://art/modular/armor.tres"), "piston": preload("res://art/modular/piston.tres"),
 	"heart-cage": preload("res://art/modular/heart-cage.tres"), "lamp": preload("res://art/modular/lamp.tres")}
 const WEAPONS = {"arc": preload("res://art/painted/arc.tres"), "probe": preload("res://art/painted/probe.tres"), "nailer": preload("res://art/painted/nailer.tres")}
+const FLOOR_BOUNDS := Rect2(112, 135, 416, 159)
+const FOOT_RADIUS := 5.0
 
 var game
 var clock := 0.0
@@ -37,6 +42,9 @@ var light: GradientTexture2D
 var wall_modules: Array[Dictionary] = []
 var hero_metadata: Dictionary
 var enemy_metadata: Dictionary
+var feedback := ImpactField.new()
+var fixtures: Array[Dictionary] = []
+var fixture_contact := Vector2.ZERO
 
 func _ready() -> void:
 	hero_metadata = JSON.parse_string(FileAccess.get_file_as_string("res://art/modular/09.json"))
@@ -57,10 +65,143 @@ func _ready() -> void:
 
 func _physics_process(dt: float) -> void:
 	if game == null: return
-	if game.screen in ["play", "title"] and game.impact_pause <= 0:
+	update_feedback_settings()
+	position = feedback.camera_offset(dt, game.screen in ["play", "dying"]) * 2
+	if game.screen in ["play", "dying"]: feedback.step(dt)
+	if game.screen in ["play", "title"]:
 		clock += dt
+		for fixture in fixtures:
+			if fixture.hp > 0 and fixture.fuse >= 0:
+				fixture.fuse -= dt
+				if fixture.fuse <= 0: break_fixture(fixture)
 		for key in doors:
 			doors[key].amount = move_toward(float(doors[key].amount), float(doors[key].target), dt * 5)
+
+func reset_feedback(room: String) -> void:
+	feedback.reset()
+	position = Vector2.ZERO
+	fixtures.clear()
+	doors.clear()
+	if room in ["field", "press"]:
+		for p in [Vector2(144, 244), Vector2(181, 244)]:
+			fixtures.append({"p": p, "hp": 1, "fuse": -1.0})
+
+func room_props() -> Array[Dictionary]:
+	match game.room:
+		"hub":
+			return [{"kind": "shop", "p": game.SHOP}, {"kind": "graft", "p": game.GRAFT, "filled": game.integrated},
+				{"kind": "gate", "p": game.DEPART, "opened": game.stage != 4 or game.integrated}]
+		"intake":
+			return [{"kind": "terminal", "p": game.TERMINAL, "active": game.cycle == 1},
+				{"kind": "gate", "p": game.BYPASS_GATE, "opened": game.cycle > 1},
+				{"kind": "gate", "p": game.PRESS_GATE, "opened": game.build_id != ""}]
+		"field":
+			return [{"kind": "gate", "p": Vector2(game.EXIT.x, 139), "opened": game.cleared}]
+		"press":
+			var props: Array[Dictionary] = [{"kind": "boss", "p": game.CORE}]
+			if game.boss_hp == 0:
+				if game.campaign: props.append({"kind": "gate", "p": Vector2(game.EXIT.x, 139), "opened": true})
+				else: props.append({"kind": "terminal", "p": game.LOG_POINT, "active": not game.log_read})
+			return props
+		"bypass":
+			return [{"kind": "terminal", "p": game.SUPPLY, "active": true}]
+	return []
+
+func floor_blockers() -> Array[Rect2]:
+	var boxes: Array[Rect2] = []
+	for prop in room_props():
+		var p: Vector2 = prop.p
+		match prop.kind:
+			"gate":
+				var slide := door_slide(p, prop.opened)
+				for side in [-1, 1]:
+					boxes.append(Rect2(p + Vector2(side * 10 + side * slide - 10, -7), Vector2(20 - slide * 0.55, 8)))
+					boxes.append(Rect2(p + Vector2(side * 25 - 4, -9), Vector2(8, 12)))
+			"shop": boxes.append(Rect2(p + Vector2(-25, -11), Vector2(50, 11)))
+			"terminal": boxes.append(Rect2(p + Vector2(-8, -12), Vector2(16, 12)))
+			"graft": boxes.append(Rect2(p + Vector2(-51, -18), Vector2(102, 18)))
+			"boss": boxes.append(Rect2(p + Vector2(-46, -52), Vector2(92, 56)))
+	for fixture in fixtures:
+		if fixture.hp > 0: boxes.append(Rect2(fixture.p - Vector2(6, 9), Vector2(12, 9)))
+	return boxes
+
+func slide_on_floor(from: Vector2, delta: Vector2, radius := FOOT_RADIUS) -> Vector2:
+	if delta == Vector2.ZERO: return from
+	var boxes := floor_blockers()
+	var position_on_floor := from
+	for axis in 2:
+		if delta[axis] == 0.0: continue
+		var side := 1 - axis
+		var start := position_on_floor[axis]
+		var stop := clampf(start + delta[axis], FLOOR_BOUNDS.position[axis], FLOOR_BOUNDS.end[axis])
+		for box in boxes:
+			var expanded := box.grow(radius)
+			if position_on_floor[side] <= expanded.position[side] or position_on_floor[side] >= expanded.end[side]:
+				continue
+			if stop > start and start <= expanded.position[axis]: stop = minf(stop, expanded.position[axis])
+			elif stop < start and start >= expanded.end[axis]: stop = maxf(stop, expanded.end[axis])
+		position_on_floor[axis] = stop
+	return position_on_floor
+
+func update_feedback_settings() -> void:
+	feedback.reduced = game.reduced_motion
+	feedback.shake_strength = game.shake_strength
+	feedback.reduce_flash = game.reduce_flash
+
+func impact(point: Vector2, direction: Vector2, material: String, tier := "hit") -> void:
+	update_feedback_settings()
+	feedback.burst(point, direction, material, tier)
+
+func break_fixture(fixture: Dictionary) -> void:
+	if fixture.hp <= 0: return
+	fixture.hp = 0
+	fixture.fuse = -1.0
+	impact(fixture.p - Vector2(0, 13), Vector2.UP, "coolant", "coolant")
+	game.play_sound("break")
+	for other in fixtures:
+		if other.hp > 0 and other.fuse < 0 and fixture.p.distance_to(other.p) <= 44: other.fuse = 0.12
+
+func strike_fixtures(origin: Vector2, direction: Vector2, reach: float, weapon: String) -> bool:
+	var hit := false
+	var ordered := fixtures.duplicate()
+	ordered.sort_custom(func(a, b): return origin.distance_squared_to(a.p) < origin.distance_squared_to(b.p))
+	for fixture in ordered:
+		if fixture.hp <= 0: continue
+		var to: Vector2 = fixture.p - origin
+		if to.length() <= reach and to.normalized().dot(direction) >= (0.5 if weapon == "arc" else 0.94):
+			fixture_contact = fixture.p - Vector2(0, 13)
+			break_fixture(fixture)
+			hit = true
+			if weapon == "nailer": break
+	return hit
+
+func wall_distance(origin: Vector2, direction: Vector2, reach: float) -> float:
+	var result := reach
+	for axis in 2:
+		if absf(direction[axis]) < 0.001: continue
+		var edge: float = (106 if direction.x < 0 else 536) if axis == 0 else (132 if direction.y < 0 else 298)
+		var travel: float = (edge - origin[axis]) / direction[axis]
+		if travel <= 0 and (origin[axis] - edge) * direction[axis] >= 0: return 0.0
+		if travel > 0: result = minf(result, travel)
+	return result
+
+func fixture_hint() -> String:
+	for fixture in fixtures:
+		if fixture.hp > 0 and game.player.distance_to(fixture.p) < 30: return "冷却罐 · 攻击可击碎"
+	return ""
+
+func coolant_can(fixture: Dictionary) -> void:
+	var p: Vector2 = fixture.p
+	if fixture.hp <= 0:
+		panel(Rect2(p + Vector2(-6, -3), Vector2(12, 3)), NIGHT)
+		stroke([p + Vector2(-4, -4), p + Vector2(-2, -7), p + Vector2(2, -3)], SLATE)
+		return
+	shadow(p, 8)
+	panel(Rect2(p + Vector2(-6, -24), Vector2(12, 23)), SLATE)
+	rect(Rect2(p + Vector2(-3, -20), Vector2(6, 13)), NIGHT)
+	for y in range(-18, -7, 3): rect(Rect2(p + Vector2(-2, y), Vector2(4, 1)), CYAN)
+	panel(Rect2(p + Vector2(-3, -28), Vector2(6, 4)), BRASS)
+	stroke([p + Vector2(-5, -3), p + Vector2(5, -3)], MIST)
 
 func rect(box: Rect2, color: Color) -> void:
 	draw_rect(Rect2(box.position.snapped(Vector2(0.5, 0.5)), box.size), color * shade)
@@ -129,7 +270,7 @@ func bracket(p: Vector2, color: Color) -> void:
 		stroke([corner + Vector2(-side * 5, 0), corner, corner + Vector2(0, 16), corner + Vector2(-side * 5, 16)], color)
 
 func part(id: String, box: Rect2) -> void:
-	draw_texture_rect(MODULES[id], box, false, shade)
+	draw_texture_rect(MODULES[id], box, false, shade * feedback.tint(box.get_center()))
 
 func floor_tile(p: Vector2, alternate: bool) -> void:
 	part("hatch" if alternate else "floor", Rect2(p, Vector2(62, 42)))
@@ -186,11 +327,14 @@ func foreground() -> void:
 	stroke([Vector2(97, 315), Vector2(544, 315)], SLATE, 2)
 	shade = Color.WHITE
 
-func gate(p: Vector2, opened: bool) -> void:
+func door_slide(p: Vector2, opened: bool) -> float:
 	var key := "%s/%s" % [game.room, p.x]
 	if not doors.has(key): doors[key] = {"amount": 1.0 if opened else 0.0, "target": 1.0 if opened else 0.0}
 	doors[key].target = 1.0 if opened else 0.0
-	var slide: float = float(doors[key].amount) * 17
+	return float(doors[key].amount) * 17
+
+func gate(p: Vector2, opened: bool) -> void:
+	var slide := door_slide(p, opened)
 	part("wall-open", Rect2(p + Vector2(-29, -64), Vector2(58, 64)))
 	rect(Rect2(p + Vector2(-21, -54), Vector2(42, 54)), INK)
 	for side in [-1, 1]:
@@ -211,6 +355,15 @@ func terminal(p: Vector2, active: bool) -> void:
 	for x in range(-7, 8, 4): rect(Rect2(p + Vector2(x, -19), Vector2(2, 1)), MIST)
 	stroke([p + Vector2(-5, -12), p + Vector2(5, -12)], BRASS)
 	if active: halo(p + Vector2(0, -27), 8, CYAN)
+
+func shop_counter(p: Vector2) -> void:
+	shadow(p, 26)
+	panel(Rect2(p + Vector2(-25, -17), Vector2(50, 17)), STEEL)
+	part("hatch", Rect2(p + Vector2(-25, -23), Vector2(50, 13)))
+	rect(Rect2(p + Vector2(-22, -5), Vector2(44, 2)), TEAL)
+	part("piston", Rect2(p + Vector2(-19, -22), Vector2(15, 5)))
+	part("armor", Rect2(p + Vector2(6, -23), Vector2(14, 5)))
+	terminal(p - Vector2(0, 19), true)
 
 func heart(p: Vector2, scale_factor: float, time: float, bright: bool) -> void:
 	var beat := 0.0 if game.reduced_motion else maxf(0, sin(time * TAU * 1.1)) * 0.8
@@ -238,10 +391,11 @@ func machine(p: Vector2, graft: bool, filled: bool) -> void:
 	var phase: String = "idle" if graft else game.boss_phase
 	var warn := clampf(1.0 - game.boss_time / 0.85, 0, 1) if phase == "warn" and not game.reduced_motion else 0.0
 	var slam := 0.0
-	if phase == "strike": slam = 13.0 * (1.0 - clampf(game.boss_fx_age / 0.19, 0, 1))
+	if phase == "strike" and game.boss_fx_age >= 0.0:
+		slam = 13.0 * (1.0 - clampf(game.boss_fx_age / 0.19, 0, 1))
 	var recoil := Vector2.ZERO
 	if not graft and game.boss_hurt_age >= 0 and not game.reduced_motion:
-		recoil = game.boss_hurt_direction * 3 * maxf(0, 1 - game.boss_hurt_age / 0.2)
+		recoil = game.boss_hurt_direction * (5 if game.boss_hp == 0 else 3) * settle(game.boss_hurt_age, 0.22)
 	p += recoil.snapped(Vector2(0.5, 0.5))
 	if not graft and game.boss_hp == 0: shade = Color(0.5, 0.57, 0.61)
 	shadow(p, 53)
@@ -275,9 +429,6 @@ func machine(p: Vector2, graft: bool, filled: bool) -> void:
 			for x in [-7, 0, 7]: stroke([hammer + Vector2(x, -7), hammer + Vector2(x, 1)], NIGHT, 2)
 		if game.boss_hp < 17: stroke([p + Vector2(-19, -61), p + Vector2(-14, -52), p + Vector2(-18, -44)], MIST)
 		if game.boss_hp < 9: stroke([p + Vector2(19, -58), p + Vector2(12, -49), p + Vector2(17, -36)], MIST)
-		if game.boss_hurt_age >= 0:
-			if game.reduced_motion: bracket(p + Vector2(0, -18), BONE)
-			else: draw_effect(&"boss_hurt", game.boss_hurt_age, p - Vector2(0, 38), game.boss_hurt_direction.angle(), Vector2(48, 40))
 	else:
 		terminal(p + Vector2(50, -2), true)
 		var pump := p + Vector2(-52, -29)
@@ -303,80 +454,94 @@ func piston_link(a: Vector2, b: Vector2) -> void:
 func shadow(p: Vector2, width: float) -> void:
 	shape([p + Vector2(-width, -1), p + Vector2(-width + 5, -4), p + Vector2(width - 4, -3), p + Vector2(width + 6, 3), p + Vector2(-width + 7, 4)], Color(INK, 0.6))
 
-func equipped(grip: Vector2, direction: Vector2, tint: Color) -> void:
+func equipped(grip: Vector2, direction: Vector2, tint: Color, yaw := 0.0) -> void:
 	if game.build_id not in WEAPONS: return
 	var texture: Texture2D = WEAPONS[game.build_id]
 	var bounds := Vector2(48, 12) if game.build_id == "probe" else Vector2(31, 16)
 	var size := texture.get_size() * minf(bounds.x / texture.get_width(), bounds.y / texture.get_height())
-	draw_set_transform(grip.snapped(Vector2(0.5, 0.5)), direction.angle(), Vector2(1, -1 if direction.x < -0.1 else 1))
+	var side := -1.0 if direction.x < -0.1 else 1.0
+	draw_set_transform(grip.snapped(Vector2(0.5, 0.5)), direction.angle() + yaw * side, Vector2(1, side))
 	draw_texture_rect(texture, Rect2(Vector2(-size.x * 0.14, -size.y * 0.55), size), false, tint)
 	draw_set_transform(Vector2.ZERO)
 
 func hero(p: Vector2, tint := Color.WHITE, preview := false) -> void:
-	var clip := "walk-back" if game.face_index == 0 and not preview else "walk-front"
-	var frame := int(game.walk_clock * 12) % 6 if game.moving and not preview else 0
-	var direction: Vector2 = Vector2.RIGHT if preview else game.facing
+	if not preview:
+		tint *= feedback.tint(p - Vector2(0, 24))
+		if game.attack_age >= 0 and game.attack_age < 0.16 and not game.reduced_motion:
+			p += game.attack_direction * (4 if game.combo_step == 2 else 2) * settle(game.attack_age, 0.16)
+	var motion = game.hero_motion
+	var clip: String = "walk-front" if preview else motion.clip
+	var frame: int = 0 if preview else motion.frame
+	var direction: Vector2 = Vector2.RIGHT if preview else motion.direction
 	var side := -1.0 if direction.x < -0.1 else 1.0
 	var fallen: bool = not preview and game.screen in ["dying", "failed"]
 	if fallen:
-		clip = "death"
-		frame = 0 if game.death_age < 0.12 else 1 if game.death_age < 0.28 else 2 if game.death_age < 0.48 else 3
-		if game.reduced_motion: frame = 3 if game.death_age >= 0.16 else 0
 		side = -game.death_side
 		tint *= Color.WHITE.lerp(Color(0.48, 0.53, 0.58), clampf(game.death_age / 0.75, 0, 1))
-	elif not preview and game.hurt_age >= 0:
-		clip = "death"
-		frame = 0
-	elif not preview and game.dash_left > 0:
-		clip = "dash"
-		frame = mini(3, int((0.16 - game.dash_left) / 0.04))
-		direction = game.dash_dir
-	elif not preview and (game.attack_windup > 0 or (game.attack_age >= 0 and game.attack_age < 0.27)):
-		direction = game.attack_direction
-		clip = "arc" if game.build_id == "arc" else "ranged"
-		if clip == "arc": frame = 0 if game.attack_windup > 0 else 1 if game.attack_age < 0.07 else 2 if game.attack_age < 0.14 else 3
-		else: frame = 1 if game.attack_windup > 0 else 2 if game.attack_age < 0.10 else 3
-	if game.reduced_motion and clip.begins_with("walk"): frame = 0
-	if not fallen: side = -1.0 if direction.x < -0.1 else 1.0
 	var data: Dictionary = hero_metadata[clip][frame]
 	var texture := HERO_FRAMES.get_frame_texture(clip, frame)
 	var pixel_scale: float = data.scale
 	var origin := Vector2(data.origin[0], data.origin[1]) * pixel_scale
 	var grip_offset := (Vector2(data.grip[0], data.grip[1]) - Vector2(data.origin[0], data.origin[1])) * pixel_scale
-	var grip := p + Vector2(grip_offset.x * side, grip_offset.y)
+	var compression := 0.0
+	if not preview and not game.reduced_motion:
+		if fallen: compression = settle(game.death_age, 0.12) * 0.04
+		elif clip == "death": compression = settle(game.hurt_age, 0.16) * 0.05
+	var pose_scale := Vector2(side * (1.0 + compression), 1.0 - compression)
+	var grip := p + grip_offset * pose_scale
+	var weapon_yaw: float = 0.0 if preview or game.reduced_motion else motion.yaw
+	if not preview and not game.reduced_motion:
+		grip += direction * motion.recoil
+		if game.combo_step == 1 and motion.state in [&"arc_draw", &"arc_cut"]: weapon_yaw *= -1.0
 	if tint.a > 0.5: shadow(p, 11)
-	if not preview and game.hurt_flash > 0 and not game.reduced_motion: tint *= Color(1.3, 0.65, 0.65)
+	if not preview and game.hurt_age >= 0 and not (game.reduced_motion or game.reduce_flash):
+		tint *= Color.WHITE.lerp(Color(1.24, 0.71, 0.73), settle(game.hurt_age, 0.15))
 	var show_weapon: bool = not fallen and not preview and game.build_id != ""
-	if show_weapon and direction.y < -0.7: equipped(grip, direction, tint)
-	draw_set_transform(p.snapped(Vector2(0.5, 0.5)), 0, Vector2(side, 1))
+	if show_weapon and direction.y < -0.7: equipped(grip, direction, tint, weapon_yaw)
+	draw_set_transform(p.snapped(Vector2(0.5, 0.5)), 0, pose_scale)
 	draw_texture_rect(texture, Rect2(-origin, texture.get_size() * pixel_scale), false, tint)
 	draw_set_transform(Vector2.ZERO)
-	if show_weapon and direction.y >= -0.7: equipped(grip, direction, tint)
+	if show_weapon and direction.y >= -0.7: equipped(grip, direction, tint, weapon_yaw)
 	if fallen and game.death_age >= 0.32:
 		equipped(p + Vector2(-game.death_side * 20, 1), Vector2.RIGHT, tint)
 		if not game.reduced_motion: draw_effect(&"collapse", game.death_age - 0.32, p + Vector2(game.death_side * 15, 0), 0, Vector2(48, 24))
-	elif not preview and game.hurt_age >= 0 and not game.reduced_motion:
-		draw_effect(&"player_hurt", game.hurt_age, p - Vector2(0, 24), game.hurt_direction.angle(), Vector2(32, 32))
+
+func settle(age: float, seconds: float) -> float:
+	return pow(1.0 - clampf(age / seconds, 0.0, 1.0), 2)
 
 func creature(e: Dictionary) -> void:
 	if e.hp <= 0 and e.dead > 0.5: return
 	var p: Vector2 = e.p
 	var frame := int(clock * 9) % 4
-	var tint := Color(1.3, 0.75, 0.8) if e.hurt > 0 else Color.WHITE
+	var tint := Color.WHITE
+	if e.hurt > 0 and not (game.reduce_flash or game.reduced_motion):
+		tint = tint.lerp(Color(1.20, 0.79, 0.82), settle(0.18 - e.hurt, 0.14))
+	tint *= feedback.tint(p - Vector2(0, 24))
 	if e.hp <= 0:
 		frame = 10 if e.dead < 0.16 else 11
 		tint = Color(0.65, 0.68, 0.72, maxf(0, 1 - e.dead / 0.5))
-	elif e.hurt > 0: frame = 8 if e.hurt > 0.09 else 9
 	elif e.phase == "warn": frame = 4 if e.time > 0.35 else 5
 	elif e.phase == "strike": frame = 6 if e.time > 0.08 else 7
+	elif e.hurt > 0: frame = 8 if e.hurt > 0.09 else 9
 	elif e.phase == "recover": frame = 7
 	if game.reduced_motion and e.phase == "seek": frame = 0
 	var data: Dictionary = enemy_metadata[e.kind][frame]
 	var texture: Texture2D = ENEMY_FRAMES[e.kind].get_frame_texture(&"body", frame)
 	var origin := Vector2(data.origin[0], data.origin[1]) * float(data.scale)
+	var facing := Vector2(-1 if e.dir.x < -0.1 else 1, 1)
+	var sprite_box := Rect2(-origin, texture.get_size() * float(data.scale))
+	if e.kind == "husk" and e.phase == "strike" and not game.reduced_motion:
+		var flight := clampf(e.time / 0.16, 0, 1)
+		if flight > 0.35:
+			for i in [2, 1]:
+				var echo: Vector2 = p.lerp(e.launch, flight * i * 0.28) - Vector2(0, 4 * i)
+				draw_set_transform(echo.round(), 0, facing)
+				draw_texture_rect(texture, sprite_box, false, Color(RAKE, flight * 0.18 / i))
+			draw_set_transform(Vector2.ZERO)
 	shadow(p, 20 if e.kind != "worker" else 11)
-	draw_set_transform(p.snapped(Vector2(0.5, 0.5)), 0, Vector2(-1 if e.dir.x < -0.1 else 1, 1))
-	draw_texture_rect(texture, Rect2(-origin, texture.get_size() * float(data.scale)), false, tint)
+	var compression := 0.0 if game.reduced_motion else settle(0.18 - e.hurt, 0.15) * 0.05
+	draw_set_transform(p.snapped(Vector2(0.5, 0.5)), 0, facing * Vector2(1.0 + compression, 1.0 - compression))
+	draw_texture_rect(texture, sprite_box, false, tint)
 	draw_set_transform(Vector2.ZERO)
 	if e.hp > 0:
 		var height := 67 if e.kind == "sentinel" else 48 if e.kind == "worker" else 38
@@ -393,34 +558,29 @@ func _draw() -> void:
 	if room == "field": variant = 4 if game.stage == 5 else game.stage
 	if room == "intake" and game.cycle > 1: variant = 2
 	draw_room(variant)
+	feedback.draw_ground(self)
+	if not title and game.hp > 0:
+		if room == "press" and game.boss_phase in ["warn", "strike"]: boss_telegraph()
+		if room == "field":
+			for e in game.enemies:
+				if e.hp > 0 and e.phase in ["warn", "strike"]: enemy_telegraph(e)
 	var entities: Array[Dictionary] = []
+	if not title:
+		for fixture in fixtures: entities.append({"kind": "fixture", "p": fixture.p, "fixture": fixture})
 	if title:
 		entities.append({"kind": "graft", "p": Vector2(459, 273), "filled": true})
 		entities.append({"kind": "hero-preview", "p": Vector2(357, 276)})
-	elif room == "hub":
-		entities.append({"kind": "terminal", "p": game.SHOP, "active": true})
-		entities.append({"kind": "gate", "p": game.DEPART, "opened": true})
-		entities.append({"kind": "graft", "p": game.GRAFT, "filled": game.integrated})
-	elif room == "field":
-		for e in game.enemies: entities.append({"kind": "enemy", "p": e.p, "enemy": e})
-		entities.append({"kind": "gate", "p": Vector2(500, 139), "opened": game.cleared})
-	elif room == "intake":
-		entities.append({"kind": "terminal", "p": game.TERMINAL, "active": game.cycle == 1})
-		entities.append({"kind": "gate", "p": Vector2(171, 139), "opened": game.cycle > 1})
-		entities.append({"kind": "gate", "p": Vector2(463, 139), "opened": game.build_id != ""})
+	else:
+		entities.append_array(room_props())
+		if room == "field":
+			for e in game.enemies: entities.append({"kind": "enemy", "p": e.p, "enemy": e})
+	if room == "intake":
 		var route: Array[Vector2] = [Vector2(320, 228), Vector2(320, 202), Vector2(320, 174)]
 		if game.cycle > 1: route = [Vector2(276, 230), Vector2(245, 207), Vector2(211, 181), Vector2(175, 157)]
 		elif game.build_id != "": route = [Vector2(351, 207), Vector2(393, 189), Vector2(432, 167), Vector2(463, 150)]
 		for p in route:
 			block(p.x - 7, p.y, 4, 2, AMBER)
 			block(p.x + 4, p.y, 4, 2, AMBER)
-	elif room == "press":
-		if game.hp > 0 and game.boss_phase in ["warn", "strike"]: draw_rect(game.hazard, Color(RED, 0.13 if game.boss_phase == "warn" else 0.34))
-		entities.append({"kind": "boss", "p": game.CORE})
-		if game.boss_hp == 0:
-			if game.campaign: entities.append({"kind": "gate", "p": Vector2(500, 139), "opened": true})
-			else: entities.append({"kind": "terminal", "p": game.LOG_POINT, "active": not game.log_read})
-	elif room == "bypass": entities.append({"kind": "terminal", "p": Vector2(320, 173), "active": true})
 	if not title:
 		if game.dash_left > 0 and not game.reduced_motion:
 			for i in game.dash_trail.size(): hero(game.dash_trail[i], Color(CYAN, 0.04 + i * 0.035))
@@ -430,26 +590,25 @@ func _draw() -> void:
 		match entity.kind:
 			"gate": gate(entity.p, entity.opened)
 			"terminal": terminal(entity.p, entity.active)
+			"shop": shop_counter(entity.p)
 			"graft": machine(entity.p, true, entity.filled)
 			"boss": machine(entity.p, false, true)
 			"hero": hero(entity.p)
 			"hero-preview": hero(entity.p, Color.WHITE, true)
 			"enemy": creature(entity.enemy)
+			"fixture": coolant_can(entity.fixture)
 	foreground()
 	if title: return
-	if game.screen in ["dying", "failed"]: return
+	feedback.draw_air(self, light)
+	if game.screen == "failed": return
 	if game.attack_age >= 0: attack()
 	if room == "press": boss_attack()
 	if game.campaign:
-		for fx in game.effects: expedition_effect(fx.id, fx.age, fx.p)
+		for fx in game.effects: expedition_effect(fx.id, fx.age, fx.p, fx.get("angle", 0.0))
 		if game.graft_age >= 0 and game.graft_age < 1.4: expedition_effect(&"organ_collect", game.graft_age, game.GRAFT)
-		for e in game.enemies:
-			if e.hp > 0 and e.phase in ["warn", "strike"]:
-				draw_rect(e.zone.grow(1), INK, false, 3)
-				draw_rect(e.zone, RED, false, 2)
-				draw_line(e.zone.position + Vector2(4, 4), e.zone.end - Vector2(4, 4), RED, 1)
 		if game.room == "field" and game.cleared: bracket(game.EXIT, AMBER)
-	if room == "press" and game.boss_phase in ["warn", "strike"]: hazard()
+	draw_contacts()
+	if game.screen == "dying": return
 	if game.hint_pos != Vector2.ZERO: bracket(game.hint_pos, CYAN)
 	if game.dash_age >= 0 and not game.reduced_motion: draw_effect(&"dash", game.dash_age, game.player - Vector2(0, 8), game.dash_dir.angle(), Vector2(60, 24))
 	if game.evade_flash > 0:
@@ -457,44 +616,84 @@ func _draw() -> void:
 		else: draw_rect(Rect2(game.player - Vector2(14, 36), Vector2(28, 37)), CYAN, false, 1)
 
 func boss_attack() -> void:
-	if game.hp <= 0:
-		return
+	if game.boss_fx_age < 0 or game.reduced_motion: return
 	var r: Rect2 = game.hazard
-	if game.boss_phase == "warn":
-		var progress: float = 1.0 - game.boss_time / 0.85
-		var inset := 3.0 + 15.0 * (1.0 - progress)
-		draw_rect(r.grow(-inset), Color(RED, 0.5), false, 1)
-		for side in [-1, 1]:
-			var y: float = game.CORE.y - 49 - 6 * progress
-			block(game.CORE.x + side * 35 - 2, y, 4, 8, RED)
-	if game.boss_fx_age < 0:
-		return
-	if game.reduced_motion:
-		if game.boss_phase == "strike":
-			draw_line(r.position + Vector2(4, 4), r.end - Vector2(4, 4), MIST, 2)
-		return
 	if r.size.x > 100:
 		draw_effect(&"boss_sweep", game.boss_fx_age, r.get_center(), 0, Vector2(120, 56))
 	else:
 		draw_effect(&"boss_slam", game.boss_fx_age, r.get_center(), 0, Vector2(40, 96))
+	if game.boss_fx_age < 0.29:
+		enemy_recipe(&"shield_slam", game.boss_fx_age, r.get_center(), 0.0, Vector2(144, 164), 0.46, 0.29)
 
-func hazard() -> void:
+func chevron(tip: Vector2, direction: Vector2, span: float, color: Color) -> void:
+	var edge := direction.orthogonal() * span
+	var tail := tip - direction * minf(9, span * 0.65)
+	stroke([tail + edge, tip, tail - edge], Color(INK, 0.85), 3)
+	stroke([tail + edge, tip, tail - edge], color, 1.5)
+
+func warning_tone(progress: float, active: bool, base: Color) -> Color:
+	if active: return BONE
+	return base.lerp(Color("#ffe0ae"), 0.55 * progress)
+
+func boss_telegraph() -> void:
 	var r: Rect2 = game.hazard
-	draw_rect(r.grow(1), INK, false, 3)
-	draw_rect(r, RED, false, 2)
-	for i in range(int(r.position.x + 7), int(r.end.x - 8), 11):
-		var a := Vector2(i, r.end.y - 3)
-		draw_line(a, a + Vector2(6, -6), RED, 1)
-	var center := r.get_center().round()
-	draw_polyline(PackedVector2Array([center + Vector2(-5, 4), center + Vector2(0, -5),
-		center + Vector2(5, 4), center + Vector2(-5, 4)]), RED, 1)
+	var sweep := r.size.x > 100
+	var direction := Vector2.RIGHT if sweep else Vector2.DOWN
+	var edge := direction.orthogonal() * (r.size.y if sweep else r.size.x) * 0.5
+	var length := r.size.x if sweep else r.size.y
+	var start := r.get_center() - direction * length * 0.5
+	var active: bool = game.boss_phase == "strike"
+	var progress := 0.65 if game.reduced_motion else clampf(1.0 - game.boss_time / 0.85, 0, 1)
+	var color := warning_tone(progress, active, THREAT)
+	# Repeated treads expose the lane width at several points, including its ends.
+	for i in 8:
+		var from := start + direction * length * i / 8.0
+		var to := from + direction * (length / 8.0 - 2)
+		var alpha := 0.14 if active else 0.07 + 0.09 * progress
+		if i % 2 == 0: alpha *= 0.6
+		shape([from - edge, from + edge, to + edge, to - edge], Color(THREAT, alpha))
+		for side in [-1, 1]:
+			var rail: Vector2 = from + edge * side
+			stroke([rail, rail + direction * (length / 8.0 - 4)], Color(color, 0.72), 1.25)
+	for i in 5:
+		var distance := length * float(i + 1) / 5
+		var lit := active or progress >= float(i) / 5
+		chevron(start + direction * distance, direction, edge.length() - 3, Color(color, 0.9 if lit else 0.42))
+
+func enemy_telegraph(e: Dictionary) -> void:
+	var active: bool = e.phase == "strike"
+	var progress := 0.65 if game.reduced_motion else clampf(1.0 - e.time / game.ENEMY_WINDUP, 0, 1)
+	var color := warning_tone(progress, active, RAKE if e.kind == "husk" else THREAT)
+	var points: PackedVector2Array = e.zone
+	draw_colored_polygon(points, Color(color, 0.14 if active else 0.06 + progress * 0.1))
+	match e.kind:
+		"husk":
+			for i in range(0, points.size(), 2):
+				stroke([points[i], points[i + 1]], color, 1.5)
+			var path: Vector2 = e.aim - e.launch
+			if path.length() > 15:
+				for j in 3:
+					var step := float(j + 1) * 0.21
+					chevron(e.launch + path * step, path.normalized(), 4, Color(color, 0.9 if progress >= step else 0.45))
+			chevron(e.aim + e.dir * 5, e.dir, 7, color)
+		"worker":
+			stroke([points[0], points[1]], Color(color, 0.75), 1)
+			stroke([points[3], points[2]], Color(color, 0.75), 1)
+			for i in 4:
+				var fraction := (i + 1) / 4.0
+				chevron(e.launch.lerp(e.aim, fraction), e.dir, 10, Color(color, 0.9 if progress >= fraction - 0.25 else 0.45))
+		_:
+			stroke(Array(points), Color(color, 0.78), 1.5)
+			stroke([points[-1], points[0]], Color(color, 0.55))
+			for i in [-1, 0, 1]:
+				var direction: Vector2 = e.dir.rotated(i * 0.44)
+				chevron(e.launch + direction * 45, direction, 8, color)
 
 func attack() -> void:
 	var p: Vector2 = game.attack_origin
 	var dir: Vector2 = game.attack_direction
 	var probe: bool = game.build_id != "arc"
 	var age: float = game.attack_age
-	var impact: Vector2 = game.attack_contact
 	if game.reduced_motion:
 		if age < 0.11:
 			if probe:
@@ -504,21 +703,37 @@ func attack() -> void:
 				for a in [-0.95, -0.48, 0.0, 0.48, 0.95]:
 					blade.append((p + dir.rotated(a) * 50).round())
 				draw_polyline(blade, MIST, 2)
-		if game.attack_result != "miss" and age < 0.17:
-			draw_rect(Rect2(impact - Vector2(5, 4), Vector2(10, 8)),
-				BONE if game.attack_result == "hit" else SLATE, false, 2)
 		return
 	if probe:
-		draw_effect(&"pulse", age, p, dir.angle(), Vector2(12, 12),
-			Vector2(game.attack_distance / 108.0, 1.0))
-		if game.campaign and game.build_id == "nailer" and age < 0.07:
-			draw_line(p, p + dir * game.attack_distance, BONE, 1)
+		if game.build_id == "nailer":
+			if age < 0.07:
+				draw_line(p, p + dir * game.attack_distance, Color(AMBER, 1 - age / 0.07), 0.75)
+				draw_line(p, p + dir * 6, AMBER if game.reduce_flash else BONE, 2)
+		else:
+			draw_effect(&"pulse", age, p, dir.angle(), Vector2(12, 12), Vector2(game.attack_distance / 108.0, 1.0))
 	else:
-		draw_effect(&"sweep", age, p, dir.angle(), Vector2(64, 64))
-	if game.attack_result == "guard":
-		draw_effect(&"guard", age, impact, dir.angle(), Vector2(32, 32))
-	elif game.attack_result == "hit":
-		draw_effect(&"probe_hit" if probe else &"arc_hit", age, impact, dir.angle(), Vector2(32, 32))
+		var tilt := -0.18 if game.combo_step == 1 else 0.12 if game.combo_step == 2 else 0.0
+		draw_effect(&"sweep", age, p, dir.angle() + tilt, Vector2(64, 64), Vector2(1, -1 if game.combo_step == 1 else 1))
+
+func draw_contacts() -> void:
+	for contact in feedback.contacts:
+		if contact.material == "coolant": continue
+		var point: Vector2 = contact.p.round()
+		var dir: Vector2 = contact.dir
+		var age: float = contact.age
+		var size: float = 4.0 + contact.power * 3.0
+		if game.reduced_motion or game.reduce_flash:
+			if age >= 0.15: continue
+			var tangent := Vector2(-dir.y, dir.x)
+			var color := MIST if contact.tier == "guard" else Color(contact.color).lerp(MIST, 0.4)
+			draw_polyline(PackedVector2Array([point - dir * size - tangent * 4, point, point - dir * size + tangent * 4]), color, 1)
+		elif contact.tier == "guard":
+			enemy_recipe(&"shield_contact", age, point, dir.angle(), Vector2(100, 66), 0.47, 0.22)
+		elif contact.tier == "finish" or (contact.tier == "heavy" and contact.material == "metal"):
+			enemy_recipe(&"heavy_contact", age, point, dir.angle(), Vector2(84, 80), 0.47 if contact.tier == "finish" else 0.37, 0.40)
+		else:
+			var id := &"metal_hit" if contact.material == "metal" else &"tissue_hit"
+			enemy_recipe(id, age, point, dir.angle(), Vector2(44, 44), size / 16.0, 0.24)
 
 func draw_effect(id: StringName, age: float, p: Vector2, angle: float, pivot: Vector2,
 		stretch := Vector2.ONE) -> void:
@@ -528,16 +743,34 @@ func draw_effect(id: StringName, age: float, p: Vector2, angle: float, pivot: Ve
 	var forward := Vector2.from_angle(angle)
 	var sideways := Vector2(-forward.y, forward.x)
 	draw_set_transform_matrix(Transform2D(forward * stretch.x, sideways * stretch.y, p.round()))
-	draw_texture(COMBAT_FX.get_frame_texture(id, frame), -pivot)
+	draw_texture(COMBAT_FX.get_frame_texture(id, frame), -pivot, Color(0.78, 0.81, 0.82, 0.78) if game.reduce_flash else Color.WHITE)
 	draw_set_transform(Vector2.ZERO)
 
-func expedition_effect(id: StringName, age: float, p: Vector2) -> void:
+func expedition_effect(id: StringName, age: float, p: Vector2, angle := 0.0) -> void:
+	match id:
+		&"pounce_rake":
+			enemy_recipe(id, age, p, angle, Vector2(73, 67), 0.8, 0.26)
+			return
+		&"wrench_arc":
+			enemy_recipe(id, age, p, angle, Vector2(81, 60), 0.84, 0.27)
+			return
+		&"shield_slam":
+			enemy_recipe(id, age, p, 0.0, Vector2(144, 164), 0.38, 0.30)
+			return
 	if game.reduced_motion:
 		if age < 0.16: draw_rect(Rect2(p - Vector2(8, 15), Vector2(16, 12)), CYAN if id == &"organ_collect" else BONE, false, 1)
 		return
 	var frame := floori(age * EXP_FX.get_animation_speed(id))
 	if frame >= EXP_FX.get_frame_count(id): return
-	var pivot := Vector2(56, 94) if id == &"organ_collect" else Vector2(44, 64)
 	draw_set_transform(p.round(), 0, Vector2(0.5, 0.5))
-	draw_texture(EXP_FX.get_frame_texture(id, frame), -pivot)
+	draw_texture(EXP_FX.get_frame_texture(id, frame), -Vector2(56, 94), Color(0.78, 0.81, 0.82, 0.78) if game.reduce_flash else Color.WHITE)
+	draw_set_transform(Vector2.ZERO)
+
+func enemy_recipe(id: StringName, age: float, p: Vector2, angle: float, pivot: Vector2, zoom: float, duration: float) -> void:
+	if game.reduced_motion or age >= duration: return
+	var count := EXP_FX.get_frame_count(id)
+	var frame := mini(count - 1, floori(age / duration * count))
+	var fade := 1.0 - smoothstep(duration * 0.58, duration, age)
+	draw_set_transform(p.round(), angle, Vector2.ONE * zoom)
+	draw_texture(EXP_FX.get_frame_texture(id, frame), -pivot, Color(0.78, 0.81, 0.82, fade * 0.78) if game.reduce_flash else Color(1, 1, 1, fade))
 	draw_set_transform(Vector2.ZERO)

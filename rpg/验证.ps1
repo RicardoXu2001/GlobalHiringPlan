@@ -105,7 +105,7 @@ Write-Record 'run.json' ([ordered]@{
 Write-Record 'verification.json' ([ordered]@{
     schemaVersion=2
     status=($(if ($code -ne 0) {'FAIL'} elseif ($facts.Values -contains 'NOT_RUN') {'NOT_RUN'} else {'PASS'}))
-    verify=@{command=$command; exitCode=$code; suites=@('Godot native viewport and injected keyboard/mouse events', 'Prologue combat, dodge, hurt and death regression', 'Four-room expedition, graft, shop, persisted stock and rearmed encounter')}
+    verify=@{command=$command; exitCode=$code; suites=@('Godot native viewport and injected keyboard/mouse events', 'Prologue combat, dodge, hurt and death regression', 'Four-room expedition, graft, shop, persisted stock and rearmed encounter', 'Buffered input, dodge cancellation, coolant chain, particle landing and reduced effects')}
     completeRun=$completeRun
     checks=$checks
     limitations=@(

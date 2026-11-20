@@ -1,6 +1,5 @@
 {
   "qa": {
-    "command": "& ./rpg/验证.ps1",
     "checks": {
       "launch": "PASS",
       "render": "PASS",
@@ -9,14 +8,15 @@
       "outcome": "PASS",
       "restart": "PASS"
     },
-    "exitCode": 0,
     "completeRun": {
       "id": "native-prologue-and-expedition",
       "cleanContext": true,
       "terminal": "b17-and-grafted-rearmed-encounter-completed",
       "restart": "initial-state",
       "evidence": "qa/run.json"
-    }
+    },
+    "exitCode": 0,
+    "command": "& ./rpg/验证.ps1"
   },
   "runtime": "4.5.1-stable (official)",
   "renderer": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -301,7 +301,7 @@
       "death_age": 0.0,
       "evade": false,
       "expedition_stage": 2,
-      "hp": 1,
+      "hp": 3,
       "hurt_age": -1.0,
       "id": "room-3-cleared",
       "integrated": false,
@@ -333,9 +333,9 @@
       "screen": "shop",
       "stage": 0,
       "stock": [
-        "arc",
         "nailer",
-        "plating"
+        "probe",
+        "arc"
       ],
       "tier": 1
     },
@@ -359,9 +359,9 @@
       "screen": "exp_complete",
       "stage": 0,
       "stock": [
-        "arc",
         "nailer",
-        "plating"
+        "probe",
+        "arc"
       ],
       "tier": 1
     },
@@ -408,6 +408,72 @@
       "stage": 0,
       "stock": [],
       "tier": 0
+    },
+    {
+      "boss_hp": 24,
+      "boss_phase": "idle",
+      "cash": 0,
+      "continuable": true,
+      "cycle": 1,
+      "dash_left": 0.0,
+      "death_age": 0.0,
+      "evade": false,
+      "expedition_stage": -1,
+      "hp": 5,
+      "hurt_age": -1.0,
+      "id": "hub-safe-after-restarting-during-windup",
+      "integrated": false,
+      "module": "probe",
+      "refreshed": false,
+      "room": "hub",
+      "screen": "play",
+      "stage": 0,
+      "stock": [],
+      "tier": 0
+    },
+    {
+      "boss_hp": 24,
+      "boss_phase": "idle",
+      "cash": 0,
+      "continuable": true,
+      "cycle": 1,
+      "dash_left": 0.0,
+      "death_age": 0.0,
+      "evade": false,
+      "expedition_stage": 0,
+      "hp": 5,
+      "hurt_age": -1.0,
+      "id": "buffered-attack-and-dodge-cancel",
+      "integrated": false,
+      "module": "arc",
+      "refreshed": false,
+      "room": "field",
+      "screen": "play",
+      "stage": 0,
+      "stock": [],
+      "tier": 0
+    },
+    {
+      "boss_hp": 24,
+      "boss_phase": "idle",
+      "cash": 0,
+      "continuable": true,
+      "cycle": 1,
+      "dash_left": 0.0,
+      "death_age": 0.0,
+      "evade": false,
+      "expedition_stage": 0,
+      "hp": 5,
+      "hurt_age": -1.0,
+      "id": "environment-feedback-and-reduced-effects",
+      "integrated": false,
+      "module": "nailer",
+      "refreshed": false,
+      "room": "field",
+      "screen": "play",
+      "stage": 0,
+      "stock": [],
+      "tier": 0
     }
   ],
   "frames": [
@@ -436,7 +502,9 @@
     "expedition-shop.png",
     "expedition-rearmed.png",
     "expedition-outcome.png",
-    "expedition-arc.png"
+    "expedition-arc.png",
+    "feedback-coolant-burst.png",
+    "feedback-surface-marks.png"
   ],
   "error": ""
 }
